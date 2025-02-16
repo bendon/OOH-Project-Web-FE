@@ -1,15 +1,22 @@
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Script from "next/script";
+import Topnav from "./components/Topnav";
+import Sidenav from "./components/Sidenav";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -22,10 +29,29 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
+      <main className="main" id="top">
+      <Sidenav/>
+      <Topnav/>
+    
+     <div className="content">
+     {children}
+     </div>
+      
+      </main>
+        
+
+        <Script src="/js/popper/popper.min.js" strategy="afterInteractive" />
+        <Script src="/js/bootstrap/bootstrap.min.js" strategy="afterInteractive" />
+        <Script src="/js/anchorjs/anchor.min.js" strategy="afterInteractive" />
+        <Script src="/js/is/is.min.js" strategy="afterInteractive" />
+        <Script src="/js/lodash/lodash.min.js" strategy="afterInteractive" />
+        <Script src="./js/list.js/list.min.js" strategy="afterInteractive" />
+        <Script src="/js/dayjs/dayjs.min.js" strategy="afterInteractive" />
+        <Script src="/js/phoenix.js" strategy="afterInteractive" />
       </body>
     </html>
   );
