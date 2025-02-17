@@ -1,5 +1,5 @@
 # Use official Node.js image as base
-FROM node:18-alpine
+FROM node:20-alpine
 
 # Set working directory inside the container
 WORKDIR /app
@@ -11,9 +11,9 @@ COPY package*.json ./
 
 # RUN npm cache clean --force
 
-# RUN npm install -g npm@10.9.1
+RUN npm install -g npm@10.9.1
 
-# RUN npm install -g vite
+RUN npm install -g vite
 # Install dependencies
 RUN npm install
 
