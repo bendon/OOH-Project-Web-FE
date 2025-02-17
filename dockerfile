@@ -7,8 +7,12 @@ WORKDIR /app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
+RUN rm -rf node_modules package-lock.json
 # Install dependencies
 RUN npm install
+
+RUN npm install -g vite
+RUN npm install vite --save-dev
 
 # Copy the rest of the app files
 COPY . .
@@ -16,10 +20,11 @@ COPY . .
 # Build the app for production
 RUN npm run build
 
-RUN npm install -g vite
+
+
 
 # Expose the port that the app will run on
-EXPOSE 5173
+EXPOSE 4173
 
 # Serve the app using Vite's production server
 CMD ["npm", "run", "preview"]
