@@ -1,34 +1,20 @@
-# Use official Node.js image as base
-FROM node:20-alpine
+FROM node:18-alpine AS build
 
-# Set working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json
 COPY package*.json ./
 
-# RUN rm -rf node_modules package-lock.json
-
-# RUN npm cache clean --force
-
-RUN npm install -g npm@10.9.1
-
-RUN npm install -g vite
-# Install dependencies
 RUN npm install
 
-
-# Copy the rest of the app files
 COPY . .
 
-# Build the app for production
-# RUN npm run build
+RUN npm run build
 
+# Production stage
+FROM nginx:latest
 
+COPY --from=build /app/dist /usr/share/nginx/html
 
+EXPOSE 80
 
-# Expose the port that the app will run on
-EXPOSE 5173
-
-# Serve the app using Vite's production server
-CMD ["npm", "run", "dev"]
+CMD ["nginx", "-g", "daemon off;"]
