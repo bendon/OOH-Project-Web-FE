@@ -1,32 +1,23 @@
-# Base image
-FROM node:18-alpine AS builder
+# Use official Node.js image as base
+FROM node:18-alpine
 
-# Set working directory
+# Set working directory inside the container
 WORKDIR /app
 
-# Copy package.json and install dependencies
-COPY package.json package-lock.json ./
-RUN npm install --frozen-lockfile
+# Copy package.json and package-lock.json
+COPY package*.json ./
 
-# Copy project files
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the app files
 COPY . .
 
-# Build Next.js application
+# Build the app for production
 RUN npm run build
 
-# Production image
-FROM node:18-alpine AS runner
-WORKDIR /app
+# Expose the port that the app will run on
+EXPOSE 5173
 
-# Copy built files
-COPY --from=builder /app/.next .next
-COPY --from=builder /app/public public
-COPY --from=builder /app/node_modules node_modules
-COPY --from=builder /app/package.json package.json
-
-# Set environment variables
-ENV NODE_ENV=production
-EXPOSE 3000
-
-# Run the application
-CMD ["npm", "start"]
+# Serve the app using Vite's production server
+CMD ["npm", "run", "preview"]

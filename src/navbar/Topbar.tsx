@@ -1,7 +1,7 @@
 import { Bell, Moon, Sun } from 'lucide-react'
 import React from 'react'
 
-export default function Topnav() {
+export default function Topbar() {
   return (
     <nav className="navbar navbar-top fixed-top navbar-expand" style={{backgroundColor: '#2B4B9B'}} id="navbarDefault">
         <div className="collapse navbar-collapse justify-content-between">

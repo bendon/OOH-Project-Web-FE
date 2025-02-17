@@ -1,4 +1,3 @@
-
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('bootstrap')) :
   typeof define === 'function' && define.amd ? define(['bootstrap'], factory) :
@@ -142,10 +141,9 @@
 
   /* --------------------------------- Cookie --------------------------------- */
 
-  const setCookie = (name, value, expire) => {
-    const expires = new Date();
-    expires.setTime(expires.getTime() + expire);
-    document.cookie = `${name}=${value};expires=${expires.toUTCString()}`;
+  const setCookie = (name, value, seconds) => {
+    const expires = window.dayjs().add(seconds, 'second').toDate();
+    document.cookie = `${name}=${value};expires=${expires}`;
   };
 
   const getCookie = name => {
@@ -191,42 +189,42 @@
 
   /* get Dates between */
 
-  // const getDates = (
-  //   startDate,
-  //   endDate,
-  //   interval = 1000 * 60 * 60 * 24
-  // ) => {
-  //   const duration = endDate - startDate;
-  //   const steps = duration / interval;
-  //   return Array.from(
-  //     { length: steps + 1 },
-  //     (v, i) => new Date(startDate.valueOf() + interval * i)
-  //   );
-  // };
+  const getDates = (
+    startDate,
+    endDate,
+    interval = 1000 * 60 * 60 * 24
+  ) => {
+    const duration = endDate - startDate;
+    const steps = duration / interval;
+    return Array.from(
+      { length: steps + 1 },
+      (v, i) => new Date(startDate.valueOf() + interval * i)
+    );
+  };
 
-  // const getPastDates = duration => {
-  //   let days;
+  const getPastDates = duration => {
+    let days;
 
-  //   switch (duration) {
-  //     case 'week':
-  //       days = 7;
-  //       break;
-  //     case 'month':
-  //       days = 30;
-  //       break;
-  //     case 'year':
-  //       days = 365;
-  //       break;
+    switch (duration) {
+      case 'week':
+        days = 7;
+        break;
+      case 'month':
+        days = 30;
+        break;
+      case 'year':
+        days = 365;
+        break;
 
-  //     default:
-  //       days = duration;
-  //   }
+      default:
+        days = duration;
+    }
 
-  //   const date = new Date();
-  //   const endDate = date;
-  //   const startDate = new Date(new Date().setDate(date.getDate() - (days - 1)));
-  //   return getDates(startDate, endDate);
-  // };
+    const date = new Date();
+    const endDate = date;
+    const startDate = new Date(new Date().setDate(date.getDate() - (days - 1)));
+    return getDates(startDate, endDate);
+  };
 
   /* Get Random Number */
   const getRandomNumber = (min, max) => {
@@ -273,8 +271,8 @@
     getItemFromStore,
     setItemToStore,
     getStoreSpace,
-    // getDates,
-    // getPastDates,
+    getDates,
+    getPastDates,
     getRandomNumber,
     getSystemTheme
     // handleThemeDropdownIcon
@@ -1138,14 +1136,27 @@
       this.element.setAttribute('checked', false);
     }
 
-    toggleDisplay() {
+    toggleDisplay(replacedElement, actions) {
+      if (replacedElement || actions) {
+        replacedElement.classList.toggle(this.option.displayNoneClassName);
+        actions.classList.toggle(this.option.displayNoneClassName);
+      }
       this.actions.toggleClass(this.option.displayNoneClassName);
       this.replacedElement.toggleClass(this.option.displayNoneClassName);
+    }
+
+    deselectAll(replacedElement, actions) {
+      this.removeBulkCheck();
+      this.toggleDisplay(replacedElement, actions);
+      this.bulkSelectRows.forEach(el => {
+        el.checked = false;
+        el.removeAttribute('checked');
+      });
     }
   }
 
   const bulkSelectInit = () => {
-    const bulkSelects = document.querySelectorAll('[data-bulk-select');
+    const bulkSelects = document.querySelectorAll('[data-bulk-select]');
 
     if (bulkSelects.length) {
       bulkSelects.forEach(el => {
@@ -1206,6 +1217,9 @@
         if (control === 'phoenixTheme') {
           chart.setOption(window._.merge(getDefaultOptions(), userOptions));
         }
+        if (responsiveOptions) {
+          handleResize(responsiveOptions);
+        }
       }
     );
   };
@@ -1227,7 +1241,286 @@
     });
   }
 
+  const handleTooltipPosition = ([pos, , dom, , size]) => {
+    // only for mobile device
+    if (window.innerWidth <= 540) {
+      const tooltipHeight = dom.offsetHeight;
+      const obj = { top: pos[1] - tooltipHeight - 20 };
+      obj[pos[0] < size.viewSize[0] / 2 ? 'left' : 'right'] = 5;
+      return obj;
+    }
+    return null; // else default behaviour
+  };
 
+  // import dayjs from 'dayjs';
+  /* -------------------------------------------------------------------------- */
+  /*                     Echart Bar Member info                                 */
+  /* -------------------------------------------------------------------------- */
+
+  const basicEchartsInit = () => {
+    const { getColor, getData, getDates } = window.phoenix.utils;
+
+    const $echartBasicCharts = document.querySelectorAll('[data-echarts]');
+    $echartBasicCharts.forEach($echartBasicChart => {
+      const userOptions = getData($echartBasicChart, 'echarts');
+      const chart = window.echarts.init($echartBasicChart);
+      const getDefaultOptions = () => ({
+        color: getColor('primary'),
+        tooltip: {
+          trigger: 'item',
+          padding: [7, 10],
+          backgroundColor: getColor('body-highlight-bg'),
+          borderColor: getColor('border-color'),
+          textStyle: { color: getColor('light-text-emphasis') },
+          borderWidth: 1,
+          transitionDuration: 0,
+          extraCssText: 'z-index: 1000'
+        },
+        xAxis: {
+          type: 'category',
+          data: getDates(
+            new Date('5/1/2022'),
+            new Date('5/7/2022'),
+            1000 * 60 * 60 * 24
+          ),
+          show: true,
+          boundaryGap: false,
+          axisLine: {
+            show: true,
+            lineStyle: { color: getColor('secondary-bg') }
+          },
+          axisTick: {
+            show: false
+          },
+          axisLabel: {
+            formatter: value => window.dayjs(value).format('DD MMM'),
+            interval: 6,
+            showMinLabel: true,
+            showMaxLabel: true,
+            color: getColor('secondary-color')
+          }
+        },
+        yAxis: {
+          show: false,
+          type: 'value',
+          boundaryGap: false
+        },
+        series: [
+          {
+            type: 'bar',
+            symbol: 'none'
+          }
+        ],
+        grid: { left: 22, right: 22, top: 0, bottom: 20 }
+      });
+      echartSetOption(chart, userOptions, getDefaultOptions);
+    });
+  };
+
+  /* -------------------------------------------------------------------------- */
+  /*                             Echarts Total Sales                            */
+  /* -------------------------------------------------------------------------- */
+
+  const reportsDetailsChartInit = () => {
+    const { getColor, getData, toggleColor } = window.phoenix.utils;
+    // const phoenixTheme = window.config.config;
+    const $chartEl = document.querySelector('.echart-reports-details');
+
+    const tooltipFormatter = (params, dateFormatter = 'MMM DD') => {
+      let tooltipItem = ``;
+      params.forEach(el => {
+        tooltipItem += `<div class='ms-1'>
+          <h6 class="text-body-tertiary"><span class="fas fa-circle me-1 fs-10" style="color:${
+            el.color
+          }"></span>
+            ${el.seriesName} : ${
+        typeof el.value === 'object' ? el.value[1] : el.value
+      }
+          </h6>
+        </div>`;
+      });
+      return `<div>
+              <p class='mb-2 text-body-tertiary'>
+                ${
+                  window.dayjs(params[0].axisValue).isValid()
+                    ? window.dayjs(params[0].axisValue).format('DD MMM, YYYY')
+                    : params[0].axisValue
+                }
+              </p>
+              ${tooltipItem}
+            </div>`;
+    };
+
+    // const dates = getPastDates(7);
+    const data = [64, 40, 45, 62, 82];
+
+    if ($chartEl) {
+      const userOptions = getData($chartEl, 'echarts');
+      const chart = window.echarts.init($chartEl);
+
+      const getDefaultOptions = () => ({
+        color: [getColor('primary-lighter'), getColor('info-light')],
+        tooltip: {
+          trigger: 'axis',
+          padding: [7, 10],
+          backgroundColor: getColor('body-highlight-bg'),
+          borderColor: getColor('border-color'),
+          textStyle: { color: getColor('light-text-emphasis') },
+          borderWidth: 1,
+          transitionDuration: 0,
+          axisPointer: {
+            type: 'none'
+          },
+          formatter: tooltipFormatter,
+          extraCssText: 'z-index: 1000'
+        },
+        // legend: {
+        //   left: '76%',
+        //   top: 'auto',
+        //   icon: 'circle',
+        // },
+        xAxis: {
+          type: 'category',
+          data: ['Analysis', 'Statement', 'Action', 'Offering', 'Interlocution'],
+          axisLabel: {
+            color: getColor('body-color'),
+            fontFamily: 'Nunito Sans',
+            fontWeight: 600,
+            fontSize: 12.8,
+            rotate: 30,
+            formatter: value => `${value.slice(0, 5)}...`
+          },
+          axisLine: {
+            lineStyle: {
+              color: getColor('secondary-bg')
+            }
+          },
+          axisTick: false
+        },
+        yAxis: {
+          type: 'value',
+          splitLine: {
+            lineStyle: {
+              color: getColor('secondary-bg')
+            }
+          },
+          // splitLine: {
+          //   show: true,
+          //   lineStyle: {
+          //     color: "rgba(217, 21, 21, 1)"
+          //   }
+          // },
+          axisLabel: {
+            color: getColor('body-color'),
+            fontFamily: 'Nunito Sans',
+            fontWeight: 700,
+            fontSize: 12.8,
+            margin: 24,
+            formatter: value => `${value}%`
+          }
+        },
+        series: [
+          {
+            name: 'Revenue',
+            type: 'bar',
+            barWidth: '32px',
+            barGap: '48%',
+            showBackground: true,
+            backgroundStyle: {
+              color: toggleColor(
+                getColor('primary-bg-subtle'),
+                getColor('body-highlight-bg')
+              )
+            },
+            label: {
+              show: false
+            },
+            itemStyle: {
+              color: toggleColor(getColor('primary-light'), getColor('primary'))
+            },
+            data
+          }
+        ],
+        grid: {
+          right: '0',
+          left: '0',
+          bottom: 0,
+          top: 10,
+          containLabel: true
+        },
+        animation: false
+      });
+
+      echartSetOption(chart, userOptions, getDefaultOptions);
+    }
+  };
+
+  /*-----------------------------------------------
+  |   Chat
+  -----------------------------------------------*/
+  const chatInit = () => {
+    const { getData } = window.phoenix.utils;
+
+    const Selector = {
+      CHAT_SIDEBAR: '.chat-sidebar',
+      CHAT_TEXT_AREA: '.chat-textarea',
+      CHAT_THREADS: '[data-chat-thread]',
+      CHAT_THREAD_TAB: '[data-chat-thread-tab]',
+      CHAT_THREAD_TAB_CONTENT: '[data-chat-thread-tab-content]'
+    };
+
+    const $chatSidebar = document.querySelector(Selector.CHAT_SIDEBAR);
+    const $chatTextArea = document.querySelector(Selector.CHAT_TEXT_AREA);
+    const $chatThreads = document.querySelectorAll(Selector.CHAT_THREADS);
+    const threadTab = document.querySelector(Selector.CHAT_THREAD_TAB);
+    const threadTabContent = document.querySelector(
+      Selector.CHAT_THREAD_TAB_CONTENT
+    );
+
+    if (threadTab) {
+      const threadTabItems = threadTab.querySelectorAll("[data-bs-toggle='tab']");
+
+      const list = new window.List(threadTabContent, {
+        valueNames: ['read', 'unreadItem']
+      });
+
+      const chatBox = document.querySelector('.chat .card-body');
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      threadTabItems.forEach(tabEl =>
+        tabEl.addEventListener('shown.bs.tab', () => {
+          const value = getData(tabEl, 'chat-thread-list');
+          list.filter(item => {
+            if (value === 'all') {
+              return true;
+            }
+            return item.elm.classList.contains(value);
+          });
+        })
+      );
+    }
+
+    $chatThreads.forEach((thread, index) => {
+      thread.addEventListener('click', () => {
+        const chatContentArea = document.querySelector(
+          `.chat-content-body-${index}`
+        );
+        chatContentArea.scrollTop = chatContentArea.scrollHeight;
+        $chatSidebar.classList.remove('show');
+        if (thread.classList.contains('unread')) {
+          thread.classList.remove('unread');
+          const unreadBadge = thread.querySelector('.unread-badge');
+          if (unreadBadge) {
+            unreadBadge.remove();
+          }
+        }
+      });
+    });
+
+    if ($chatTextArea) {
+      $chatTextArea.setAttribute('placeholder', 'Type your message...');
+    }
+  };
 
   /* -------------------------------------------------------------------------- */
   /*                                   choices                                   */
@@ -1242,6 +1535,7 @@
         const choices = new window.Choices(item, {
           itemSelectText: '',
           addItems: true,
+          allowHTML: true,
           ...userOptions
         });
 
@@ -1599,6 +1893,10 @@
               .classList.remove(ClassName.DZ_FILE_COMPLETE);
           }
           item.classList.add(ClassName.DZ_FILE_PROCESSING);
+          // Kanban custom bg radio select
+          document
+            .querySelector('.kanban-custom-bg-radio')
+            ?.setAttribute('checked', true);
         });
         dropzone.on(Events.REMOVED_FILE, () => {
           if (item.querySelector(Selector.DZ_PREVIEW_COVER)) {
@@ -1646,13 +1944,13 @@
         nextArrow: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M96 480c-8.188 0-16.38-3.125-22.62-9.375c-12.5-12.5-12.5-32.75 0-45.25L242.8 256L73.38 86.63c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0l192 192c12.5 12.5 12.5 32.75 0 45.25l-192 192C112.4 476.9 104.2 480 96 480z"/></svg>`,
         prevArrow: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M224 480c-8.188 0-16.38-3.125-22.62-9.375l-192-192c-12.5-12.5-12.5-32.75 0-45.25l192-192c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25L77.25 256l169.4 169.4c12.5 12.5 12.5 32.75 0 45.25C240.4 476.9 232.2 480 224 480z"/></svg>`,
         locale: {
-          firstDayOfWeek: 0,
+          firstDayOfWeek: 1,
 
           shorthand: ['S', 'M', 'T', 'W', 'T', 'F', 'S']
         },
         monthSelectorType: 'static',
         onDayCreate: (dObj, dStr, fp, dayElem) => {
-          if (dayElem.dateObj.getDay() === 5 || dayElem.dateObj.getDay() === 6) {
+          if (dayElem.dateObj.getDay() === 6 || dayElem.dateObj.getDay() === 0) {
             dayElem.className += ' weekend-days';
           }
         },
@@ -1695,6 +1993,7 @@
     const options = merge(
       {
         initialView: 'dayGridMonth',
+        weekNumberCalculation: 'ISO',
         editable: true,
         direction: document.querySelector('html').getAttribute('dir'),
         headerToolbar: {
@@ -2341,7 +2640,8 @@
       ISOTOPE_ITEM: '.isotope-item',
       DATA_ISOTOPE: '[data-sl-isotope]',
       DATA_FILTER: '[data-filter]',
-      DATA_FILER_NAV: '[data-filter-nav]'
+      DATA_FILER_NAV: '[data-filter-nav]',
+      DATA_GALLERY_COLUMN: '[data-gallery-column]'
     };
 
     const DATA_KEY = {
@@ -2353,11 +2653,12 @@
 
     if (window.Isotope) {
       const masonryItems = document.querySelectorAll(Selector.DATA_ISOTOPE);
-      masonryItems.length &&
+      const columnGallery = document.querySelector(Selector.DATA_GALLERY_COLUMN);
+      if (masonryItems.length) {
         masonryItems.forEach(masonryItem => {
           window.imagesLoaded(masonryItem, () => {
-            masonryItem.querySelectorAll(Selector.ISOTOPE_ITEM).forEach(item => {
-              // eslint-disable-next-line
+            document.querySelectorAll(Selector.ISOTOPE_ITEM).forEach(item => {
+              // eslint-disable-next-line no-param-reassign
               item.style.visibility = 'visible';
             });
 
@@ -2369,22 +2670,50 @@
 
             const options = window._.merge(defaultOptions, userOptions);
             const isotope = new window.Isotope(masonryItem, options);
-
+            const addSeparator = (count = 4) => {
+              for (let i = 1; i < count; i += 1) {
+                const separator = document.createElement('span');
+                separator.classList.add(
+                  `gallery-column-separator`,
+                  `gallery-column-separator-${i}`
+                );
+                masonryItem.appendChild(separator);
+              }
+            };
+            const removeSeparator = () => {
+              document
+                .querySelectorAll('span[class*="gallery-column-separator-"]')
+                .forEach(separatorEle => separatorEle.remove());
+            };
+            if (columnGallery) addSeparator();
             // --------- filter -----------------
             const filterElement = document.querySelector(Selector.DATA_FILER_NAV);
-            filterElement?.addEventListener('click', function (e) {
+            filterElement?.addEventListener('click', e => {
               const item = e.target.dataset.filter;
               isotope.arrange({ filter: item });
               document.querySelectorAll(Selector.DATA_FILTER).forEach(el => {
                 el.classList.remove(ClassName.ACTIVE);
               });
               e.target.classList.add(ClassName.ACTIVE);
+              const filteredItems = isotope.getFilteredItemElements();
+              if (columnGallery) {
+                removeSeparator();
+              }
+              setTimeout(() => {
+                if (columnGallery) {
+                  addSeparator(
+                    filteredItems.length > 4 ? 4 : filteredItems.length
+                  );
+                }
+                isotope.layout();
+              }, 400);
             });
             // ---------- filter end ------------
-
+            isotope.layout();
             return isotope;
           });
         });
+      }
     }
   };
 
@@ -2646,21 +2975,44 @@
     }
   };
 
-  /* -------------------------------------------------------------------------- */
+  /* ----------------------------------------------------------------- */
   /*                               Modal                               */
-  /* -------------------------------------------------------------------------- */
+  /* ----------------------------------------------------------------- */
 
   const modalInit = () => {
     const $modals = document.querySelectorAll('[data-phoenix-modal]');
 
     if ($modals) {
+      const { getData, getCookie, setCookie } = window.phoenix.utils;
       $modals.forEach(modal => {
-        modal.addEventListener('shown.bs.modal', () => {
-          const $autofocusEls = modal.querySelectorAll('[autofocus=autofocus]');
-          $autofocusEls.forEach(el => {
-            el.focus();
+        const userOptions = getData(modal, 'phoenix-modal');
+        const defaultOptions = {
+          autoShow: false
+        };
+        const options = window._.merge(defaultOptions, userOptions);
+        if (options.autoShow) {
+          const autoShowModal = new window.bootstrap.Modal(modal);
+          const disableModalBtn = modal.querySelector(
+            '[data-disable-modal-auto-show]'
+          );
+
+          disableModalBtn.addEventListener('click', () => {
+            const seconds = 24 * 60 * 60;
+            setCookie('disableAutoShowModal', 'true', seconds);
           });
-        });
+
+          const disableAutoShowModalCookie = getCookie('disableAutoShowModal');
+          if (!disableAutoShowModalCookie) {
+            autoShowModal.show();
+          }
+        } else {
+          modal.addEventListener('shown.bs.modal', () => {
+            const $autofocusEls = modal.querySelectorAll('[autofocus=autofocus]');
+            $autofocusEls.forEach(el => {
+              el.focus();
+            });
+          });
+        }
       });
     }
   };
@@ -2874,10 +3226,35 @@
     const toggleEls = document.querySelectorAll(
       "[data-phoenix-toggle='offcanvas']"
     );
-    const offcanvasBackdrop = document.querySelector('[data-phoenix-backdrop]');
+    const offcanvasBackdrops = document.querySelectorAll(
+      '[data-phoenix-backdrop]'
+    );
     const offcanvasBodyScroll = document.querySelector('[data-phoenix-scroll]');
+    const offcanvases = document.querySelectorAll('.phoenix-offcanvas');
     const offcanvasFaq = document.querySelector('.faq');
     const offcanvasFaqShow = document.querySelector('.faq-sidebar');
+
+    if (offcanvases) {
+      const breakpoints = {
+        sm: 576,
+        md: 768,
+        lg: 992,
+        xl: 1200,
+        xxl: 1540
+      };
+
+      window.addEventListener('resize', () => {
+        offcanvases.forEach(offcanvas => {
+          const offcanvasInstance = new window.bootstrap.Offcanvas(offcanvas);
+          const breakpoint = offcanvas.getAttribute('data-breakpoint');
+          const breakpointValue = breakpoints[breakpoint];
+          if (window.innerWidth >= breakpointValue) {
+            document.body.style.overflow = '';
+            offcanvasInstance.hide();
+          }
+        });
+      });
+    }
 
     const showFilterCol = offcanvasEl => {
       offcanvasEl.classList.add('show');
@@ -2907,9 +3284,11 @@
             });
           });
         }
-        if (offcanvasBackdrop) {
-          offcanvasBackdrop.addEventListener('click', () => {
-            hideFilterCol(offcanvasTargetEl);
+        if (offcanvasBackdrops) {
+          offcanvasBackdrops.forEach(offcanvasBackdrop => {
+            offcanvasBackdrop.addEventListener('click', () => {
+              hideFilterCol(offcanvasTargetEl);
+            });
           });
         }
       });
@@ -3243,7 +3622,7 @@
       const navbarContainerWidth = navbarWidth - dropdownWidth;
       const elements = navbarEl.querySelectorAll(Selector.NAV_ITEM);
       const categoryBtn = navbarEl.querySelector(Selector.CATEGORY_BUTTON);
-      const categoryBtnWidth = categoryBtn.clientWidth;
+      const categoryBtnWidth = categoryBtn?.clientWidth;
 
       let totalItemsWidth = 0;
       dropdown.style.display = 'none';
@@ -3254,7 +3633,7 @@
         totalItemsWidth = totalItemsWidth + itemWidth;
 
         if (
-          totalItemsWidth + categoryBtnWidth + dropdownWidth >
+          totalItemsWidth + (categoryBtnWidth || 0) + dropdownWidth >
             navbarContainerWidth &&
           !item.classList.contains('dropdown')
         ) {
@@ -3384,13 +3763,13 @@
   /*                                    Toast                                   */
   /* -------------------------------------------------------------------------- */
 
-  // const simplebarInit = () => {
-  //   const scrollEl = Array.from(document.querySelectorAll('.scrollbar-overlay'));
-  //
-  //   scrollEl.forEach(el => {
-  //     return new window.SimpleBar(el);
-  //   });
-  // };
+  const simplebarInit = () => {
+    const scrollEl = Array.from(document.querySelectorAll('.scrollbar-overlay'));
+
+    scrollEl.forEach(el => {
+      return new window.SimpleBar(el);
+    });
+  };
 
   /* -------------------------------------------------------------------------- */
   /*                                 SortableJS                                 */
@@ -3425,6 +3804,31 @@
     });
   };
 
+  const supportChatInit = () => {
+    const supportChat = document.querySelector('.support-chat');
+    const supportChatBtn = document.querySelectorAll('.btn-support-chat');
+    const supportChatcontainer = document.querySelector(
+      '.support-chat-container'
+    );
+    const { phoenixSupportChat } = window.config.config;
+
+    if (phoenixSupportChat) {
+      supportChatcontainer?.classList.add('show');
+    }
+    if (supportChatBtn) {
+      supportChatBtn.forEach(item => {
+        item.addEventListener('click', () => {
+          supportChat.classList.toggle('show-chat');
+
+          supportChatBtn[supportChatBtn.length - 1].classList.toggle(
+            'btn-chat-close'
+          );
+
+          supportChatcontainer.classList.add('show');
+        });
+      });
+    }
+  };
 
   /* eslint-disable no-new */
   /*-----------------------------------------------
@@ -3434,11 +3838,9 @@
   const swiperInit = () => {
     const { getData } = window.phoenix.utils;
     const swiperContainers = document.querySelectorAll('.swiper-theme-container');
-
     if (swiperContainers) {
       swiperContainers.forEach(swiperContainer => {
         const swiper = swiperContainer.querySelector('[data-swiper]');
-
         const options = getData(swiper, 'swiper');
         const thumbsOptions = options.thumb;
         let thumbsInit;
@@ -3447,8 +3849,8 @@
           let slides = '';
           thumbImages.forEach(img => {
             slides += `
-          <div class='swiper-slide '>
-            <img class='img-fluid rounded mt-1' src=${img.src} alt=''/>
+          <div class='swiper-slide'>
+            <img class='img-fluid rounded mt-2' src=${img.src} alt=''/>
           </div>
         `;
           });
@@ -3466,9 +3868,7 @@
 
           thumbsInit = new window.Swiper(thumbs, thumbsOptions);
         }
-
         const swiperNav = swiperContainer.querySelector('.swiper-nav');
-
         new window.Swiper(swiper, {
           ...options,
           navigation: {
@@ -3479,6 +3879,12 @@
             swiper: thumbsInit
           }
         });
+        const gallerySlider = document.querySelector('.swiper-slider-gallery');
+        if (gallerySlider) {
+          window.addEventListener('resize', () => {
+            thumbsInit.update();
+          });
+        }
       });
     }
   };
@@ -3488,8 +3894,7 @@
   /* -------------------------------------------------------------------------- */
   /* eslint-disable no-param-reassign */
   /* eslint-disable */
- 
-  const { config } = window.config || {};;
+  const { config } = window.config;
 
   const initialDomSetup = element => {
     const { getData, getItemFromStore, getSystemTheme } = window.phoenix.utils;
@@ -3657,7 +4062,6 @@
         if (control === 'phoenixTheme') {
           typeof value === 'boolean' && (value = value ? 'dark' : 'light');
         }
-        const {config} = window.config;
 
         // config.hasOwnProperty(control) && setItemToStore(control, value);
         config.hasOwnProperty(control) &&
@@ -3665,7 +4069,6 @@
             [control]: value
           });
 
-        window.history.replaceState(null, null, window.location.pathname);
         switch (control) {
           case 'phoenixTheme': {
             document.documentElement.setAttribute(
@@ -3747,8 +4150,6 @@
       }
     });
   };
-
-
 
   const { merge } = window._;
 
@@ -3915,60 +4316,6 @@
     );
   };
 
-  /* -------------------------------------------------------------------------- */
-  /*                               mapbox                                   */
-  /* -------------------------------------------------------------------------- */
-
-  const mapboxInit = () => {
-    const { getData } = window.phoenix.utils;
-    const mapboxContainers = document.querySelectorAll('.mapbox-container');
-    if (mapboxContainers) {
-      mapboxContainers.forEach(mapboxContainer => {
-        window.mapboxgl.accessToken =
-          'pk.eyJ1IjoidGhlbWV3YWdvbiIsImEiOiJjbGhmNW5ybzkxcmoxM2RvN2RmbW1nZW90In0.hGIvQ890TYkZ948MVrsMIQ';
-
-        const mapbox = mapboxContainer.querySelector('[data-mapbox]');
-        if (mapbox) {
-          const options = getData(mapbox, 'mapbox');
-
-          const zoomIn = document.querySelector('.zoomIn');
-          const zoomOut = document.querySelector('.zoomOut');
-          const fullScreen = document.querySelector('.fullScreen');
-
-          const styles = {
-            default: 'mapbox://styles/mapbox/light-v11',
-            light: 'mapbox://styles/themewagon/clj57pads001701qo25756jtw',
-            dark: 'mapbox://styles/themewagon/cljzg9juf007x01pk1bepfgew'
-          };
-
-          const map = new window.mapboxgl.Map({
-            ...options,
-            container: 'mapbox',
-            style: styles[window.config.config.phoenixTheme]
-          });
-
-          if (options.center) {
-            new window.mapboxgl.Marker({
-              color: getColor('primary')
-            })
-              .setLngLat(options.center)
-              .addTo(map);
-          }
-
-          if (zoomIn && zoomOut) {
-            zoomIn.addEventListener('click', () => map.zoomIn());
-            zoomOut.addEventListener('click', () => map.zoomOut());
-          }
-          if (fullScreen) {
-            fullScreen.addEventListener('click', () =>
-              map.getContainer().requestFullscreen()
-            );
-          }
-        }
-      });
-    }
-  };
-
   /* eslint-disable no-restricted-syntax */
   /* -------------------------------------------------------------------------- */
   /*                                 step wizard                                */
@@ -4049,10 +4396,12 @@
         }
       });
 
-      prevButton.addEventListener(events.CLICK, () => {
-        count -= 1;
-        tabs[count].show();
-      });
+      if (prevButton) {
+        prevButton.addEventListener(events.CLICK, () => {
+          count -= 1;
+          tabs[count].show();
+        });
+      }
 
       if (tabToggleButtonEl.length) {
         tabToggleButtonEl.forEach((item, index) => {
@@ -4094,12 +4443,13 @@
               wizardFooter.classList.remove('d-none');
             }
             // prev-button removing
-            if (count > 0 && count !== tabToggleButtonEl.length - 1) {
-              prevButton.classList.remove('d-none');
-            } else {
-              prevButton.classList.add('d-none');
+            if (prevButton) {
+              if (count > 0 && count !== tabToggleButtonEl.length - 1) {
+                prevButton.classList.remove('d-none');
+              } else {
+                prevButton.classList.add('d-none');
+              }
             }
-            mapboxInit();
           });
         });
       }
@@ -4175,7 +4525,7 @@
           document.body.classList.add('sortable-dragging');
           window.Sortable.ghost
             .querySelector('.dropdown-menu')
-            .classList.remove('show');
+            ?.classList.remove('show');
           const dropdownElement = e.item.querySelector(
             `[data-bs-toggle='dropdown']`
           );
@@ -4188,63 +4538,115 @@
   };
 
   const towFAVerificarionInit = () => {
-    const verificationForm = document.querySelector('[data-2FA-varification]');
-    const inputFields = document.querySelectorAll(
-      '[data-2FA-varification] input[type=number]'
+    const verificationForm = document.querySelector('[data-2fa-form]');
+    const inputFields = verificationForm?.querySelectorAll('input[type=number]');
+    const varificationBtn = verificationForm?.querySelector(
+      'button[type=submit]'
     );
 
     if (verificationForm) {
       window.addEventListener('load', () => inputFields[0].focus());
-      // check if the value is not a number
-      verificationForm.addEventListener('keypress', e => {
-        if (e.target.matches('input[type=number]')) {
-          if (/\D/.test(e.key) || !!e.target.value) {
-            e.preventDefault();
+      const totalInputLength = 6;
+      inputFields.forEach((input, index) => {
+        input.addEventListener('keyup', e => {
+          const { value } = e.target;
+          if (value) {
+            [...value].slice(0, totalInputLength).forEach((char, charIndex) => {
+              if (inputFields && inputFields[index + charIndex]) {
+                inputFields[index + charIndex].value = char;
+                inputFields[index + charIndex + 1]?.focus();
+              }
+            });
+          } else {
+            inputFields[index].value = '';
+            inputFields[index - 1]?.focus();
           }
-        }
-      });
-
-      // after entering a value get focus on the next input field and remove the disabled attribute
-      const inputs = [...inputFields];
-      verificationForm.addEventListener('input', e => {
-        if (e.target.matches('input[type=number]')) {
-          const index = inputs.indexOf(e.target);
-          const nextInput = inputs[index + 1];
-          if (
-            nextInput &&
-            e.target.value !== '' &&
-            nextInput.hasAttribute('disabled')
-          ) {
-            nextInput.removeAttribute('disabled');
-            nextInput.focus();
+          const inputs = [...inputFields];
+          const updatedOtp = inputs.reduce(
+            (acc, inputData) => acc + (inputData?.value || ''),
+            ''
+          );
+          if (totalInputLength === updatedOtp.length) {
+            varificationBtn.removeAttribute('disabled');
+          } else {
+            varificationBtn.setAttribute('disabled', true);
           }
-        }
-      });
-
-      // backspace functionality
-      verificationForm.addEventListener('keydown', e => {
-        if (e.target.matches('input[type=number]') && e.keyCode === 8) {
-          const index = inputs.indexOf(e.target);
-          const prevInput = inputs[index - 1];
-          if (prevInput) {
-            prevInput.focus();
-            e.target.value = '';
-            e.target.setAttribute('disabled', true);
-          }
-        }
-      });
-
-      // return merged code
-      verificationForm.addEventListener('submit', () => {
-        const code = inputs.map(input => input.value).join('');
-        return code;
+        });
       });
     }
   };
 
+  /* -------------------------------------------------------------------------- */
+  /*                               mapbox                                   */
+  /* -------------------------------------------------------------------------- */
+
+  const mapboxInit = () => {
+    const { getData } = window.phoenix.utils;
+    const mapboxContainers = document.querySelectorAll('.mapbox-container');
+    const mapContainerTab = document.querySelectorAll('[data-tab-map-container]');
+    if (mapboxContainers) {
+      mapboxContainers.forEach(mapboxContainer => {
+        window.mapboxgl.accessToken =
+          'pk.eyJ1IjoidGhlbWV3YWdvbiIsImEiOiJjbGhmNW5ybzkxcmoxM2RvN2RmbW1nZW90In0.hGIvQ890TYkZ948MVrsMIQ';
+
+        const mapbox = mapboxContainer.querySelector('[data-mapbox]');
+        if (mapbox) {
+          const options = getData(mapbox, 'mapbox');
+
+          const zoomIn = document.querySelector('.zoomIn');
+          const zoomOut = document.querySelector('.zoomOut');
+          const fullScreen = document.querySelector('.fullScreen');
+
+          const styles = {
+            default: 'mapbox://styles/mapbox/light-v11',
+            light: 'mapbox://styles/themewagon/clj57pads001701qo25756jtw',
+            dark: 'mapbox://styles/themewagon/cljzg9juf007x01pk1bepfgew'
+          };
+
+          const map = new window.mapboxgl.Map({
+            ...options,
+            container: 'mapbox',
+            style: styles[window.config.config.phoenixTheme]
+          });
+
+          if (options.center) {
+            new window.mapboxgl.Marker({
+              color: getColor('danger')
+            })
+              .setLngLat(options.center)
+              .addTo(map);
+          }
+
+          if (zoomIn && zoomOut) {
+            zoomIn.addEventListener('click', () => map.zoomIn());
+            zoomOut.addEventListener('click', () => map.zoomOut());
+          }
+          if (fullScreen) {
+            fullScreen.addEventListener('click', () =>
+              map.getContainer().requestFullscreen()
+            );
+          }
+
+          mapContainerTab.forEach(ele => {
+            ele.addEventListener('shown.bs.tab', () => {
+              map.resize();
+            });
+          });
+        }
+      });
+    }
+  };
+
+  const themeController$2 = document.body;
+  if (themeController$2) {
+    themeController$2.addEventListener('clickControl', () => {
+      mapboxInit();
+    });
+  }
+
   const flightMapInit = () => {
-    const $flightMap = document.querySelector('#flightMap');
-    if ($flightMap) {
+    const flightMap = document.querySelector('#flightMap');
+    if (flightMap) {
       window.mapboxgl.accessToken =
         'pk.eyJ1IjoidGhlbWV3YWdvbiIsImEiOiJjbGhmNW5ybzkxcmoxM2RvN2RmbW1nZW90In0.hGIvQ890TYkZ948MVrsMIQ';
 
@@ -4400,9 +4802,9 @@
     }
   };
 
-  const themeController = document.body;
-  if (themeController) {
-    themeController.addEventListener('clickControl', () => {
+  const themeController$1 = document.body;
+  if (themeController$1) {
+    themeController$1.addEventListener('clickControl', () => {
       flightMapInit();
     });
   }
@@ -4431,7 +4833,7 @@
   /* -------------------------------------------------------------------------- */
 
   const priceTierFormInit = () => {
-    const priceTierForms = document.querySelectorAll('.price-tier-form');
+    const priceTierForms = document.querySelectorAll('[data-form-price-tier]');
     if (priceTierForms) {
       priceTierForms.forEach(priceTierForm => {
         const priceToggler = priceTierForm.querySelector('[data-price-toggle]');
@@ -4475,15 +4877,1776 @@
       const elements = document.querySelectorAll('[data-nouislider]');
       elements.forEach(item => {
         const userOptions = getData(item, 'nouislider');
-        const defaultOptions = {
-          start: [10],
-          connect: [true, false],
-          step: 1,
-          range: { min: [0], max: [100] },
-          tooltips: true
-        };
+        const sliderValues = getData(item, 'nouislider-values');
+        let defaultOptions;
+        if (sliderValues && sliderValues.length) {
+          defaultOptions = {
+            connect: true,
+            step: 1,
+            range: { min: 0, max: sliderValues.length - 1 },
+            tooltips: true,
+            format: {
+              to(value) {
+                return sliderValues[Math.round(value)];
+              },
+              from(value) {
+                return sliderValues.indexOf(value);
+              }
+            }
+          };
+        } else {
+          defaultOptions = {
+            start: [10],
+            connect: [true, false],
+            step: 1,
+            range: { min: [0], max: [100] },
+            tooltips: true
+          };
+        }
         const options = window._.merge(defaultOptions, userOptions);
         window.noUiSlider.create(item, { ...options });
+      });
+    }
+  };
+
+  const collapseAllInit = () => {
+    const collapseParent = document.querySelector('[data-collapse-all]');
+    const collapseBtn = document.querySelector('[data-btn-collapse-all]');
+    if (collapseParent) {
+      const collapseElements = collapseParent.querySelectorAll('.collapse');
+      collapseElements.forEach(ele => {
+        const collapse = window.bootstrap.Collapse.getOrCreateInstance(ele, {
+          toggle: false
+        });
+        collapseBtn.addEventListener('click', () => {
+          collapse.hide();
+        });
+      });
+    }
+  };
+
+  const leaftletPoints = [
+    {
+      lat: 53.958332,
+      long: -1.080278,
+      name: 'Diana Meyer',
+      street: 'Slude Strand 27',
+      location: '1130 Kobenhavn'
+    },
+    {
+      lat: 52.958332,
+      long: -1.080278,
+      name: 'Diana Meyer',
+      street: 'Slude Strand 27',
+      location: '1130 Kobenhavn'
+    },
+    {
+      lat: 51.958332,
+      long: -1.080278,
+      name: 'Diana Meyer',
+      street: 'Slude Strand 27',
+      location: '1130 Kobenhavn'
+    },
+    {
+      lat: 53.958332,
+      long: -1.080278,
+      name: 'Diana Meyer',
+      street: 'Slude Strand 27',
+      location: '1130 Kobenhavn'
+    },
+    {
+      lat: 54.958332,
+      long: -1.080278,
+      name: 'Diana Meyer',
+      street: 'Slude Strand 27',
+      location: '1130 Kobenhavn'
+    },
+    {
+      lat: 55.958332,
+      long: -1.080278,
+      name: 'Diana Meyer',
+      street: 'Slude Strand 27',
+      location: '1130 Kobenhavn'
+    },
+    {
+      lat: 53.908332,
+      long: -1.080278,
+      name: 'Diana Meyer',
+      street: 'Slude Strand 27',
+      location: '1130 Kobenhavn'
+    },
+    {
+      lat: 53.008332,
+      long: -1.080278,
+      name: 'Diana Meyer',
+      street: 'Slude Strand 27',
+      location: '1130 Kobenhavn'
+    },
+    {
+      lat: 53.158332,
+      long: -1.080278,
+      name: 'Diana Meyer',
+      street: 'Slude Strand 27',
+      location: '1130 Kobenhavn'
+    },
+    {
+      lat: 53.000032,
+      long: -1.080278,
+      name: 'Diana Meyer',
+      street: 'Slude Strand 27',
+      location: '1130 Kobenhavn'
+    },
+    {
+      lat: 52.292001,
+      long: -2.22,
+      name: 'Anke Schroder',
+      street: 'Industrivej 54',
+      location: '4140 Borup'
+    },
+    {
+      lat: 52.392001,
+      long: -2.22,
+      name: 'Anke Schroder',
+      street: 'Industrivej 54',
+      location: '4140 Borup'
+    },
+    {
+      lat: 51.492001,
+      long: -2.22,
+      name: 'Anke Schroder',
+      street: 'Industrivej 54',
+      location: '4140 Borup'
+    },
+    {
+      lat: 51.192001,
+      long: -2.22,
+      name: 'Anke Schroder',
+      street: 'Industrivej 54',
+      location: '4140 Borup'
+    },
+    {
+      lat: 52.292001,
+      long: -2.22,
+      name: 'Anke Schroder',
+      street: 'Industrivej 54',
+      location: '4140 Borup'
+    },
+    {
+      lat: 54.392001,
+      long: -2.22,
+      name: 'Anke Schroder',
+      street: 'Industrivej 54',
+      location: '4140 Borup'
+    },
+    {
+      lat: 51.292001,
+      long: -2.22,
+      name: 'Anke Schroder',
+      street: 'Industrivej 54',
+      location: '4140 Borup'
+    },
+    {
+      lat: 52.102001,
+      long: -2.22,
+      name: 'Anke Schroder',
+      street: 'Industrivej 54',
+      location: '4140 Borup'
+    },
+    {
+      lat: 52.202001,
+      long: -2.22,
+      name: 'Anke Schroder',
+      street: 'Industrivej 54',
+      location: '4140 Borup'
+    },
+    {
+      lat: 51.063202,
+      long: -1.308,
+      name: 'Tobias Vogel',
+      street: 'Mollebakken 33',
+      location: '3650 Olstykke'
+    },
+    {
+      lat: 51.363202,
+      long: -1.308,
+      name: 'Tobias Vogel',
+      street: 'Mollebakken 33',
+      location: '3650 Olstykke'
+    },
+    {
+      lat: 51.463202,
+      long: -1.308,
+      name: 'Tobias Vogel',
+      street: 'Mollebakken 33',
+      location: '3650 Olstykke'
+    },
+    {
+      lat: 51.563202,
+      long: -1.308,
+      name: 'Tobias Vogel',
+      street: 'Mollebakken 33',
+      location: '3650 Olstykke'
+    },
+    {
+      lat: 51.763202,
+      long: -1.308,
+      name: 'Tobias Vogel',
+      street: 'Mollebakken 33',
+      location: '3650 Olstykke'
+    },
+    {
+      lat: 51.863202,
+      long: -1.308,
+      name: 'Tobias Vogel',
+      street: 'Mollebakken 33',
+      location: '3650 Olstykke'
+    },
+    {
+      lat: 51.963202,
+      long: -1.308,
+      name: 'Tobias Vogel',
+      street: 'Mollebakken 33',
+      location: '3650 Olstykke'
+    },
+    {
+      lat: 51.000202,
+      long: -1.308,
+      name: 'Tobias Vogel',
+      street: 'Mollebakken 33',
+      location: '3650 Olstykke'
+    },
+    {
+      lat: 51.000202,
+      long: -1.308,
+      name: 'Tobias Vogel',
+      street: 'Mollebakken 33',
+      location: '3650 Olstykke'
+    },
+    {
+      lat: 51.163202,
+      long: -1.308,
+      name: 'Tobias Vogel',
+      street: 'Mollebakken 33',
+      location: '3650 Olstykke'
+    },
+    {
+      lat: 52.263202,
+      long: -1.308,
+      name: 'Tobias Vogel',
+      street: 'Mollebakken 33',
+      location: '3650 Olstykke'
+    },
+    {
+      lat: 53.463202,
+      long: -1.308,
+      name: 'Tobias Vogel',
+      street: 'Mollebakken 33',
+      location: '3650 Olstykke'
+    },
+    {
+      lat: 55.163202,
+      long: -1.308,
+      name: 'Tobias Vogel',
+      street: 'Mollebakken 33',
+      location: '3650 Olstykke'
+    },
+    {
+      lat: 56.263202,
+      long: -1.308,
+      name: 'Tobias Vogel',
+      street: 'Mollebakken 33',
+      location: '3650 Olstykke'
+    },
+    {
+      lat: 56.463202,
+      long: -1.308,
+      name: 'Tobias Vogel',
+      street: 'Mollebakken 33',
+      location: '3650 Olstykke'
+    },
+    {
+      lat: 56.563202,
+      long: -1.308,
+      name: 'Tobias Vogel',
+      street: 'Mollebakken 33',
+      location: '3650 Olstykke'
+    },
+    {
+      lat: 56.663202,
+      long: -1.308,
+      name: 'Tobias Vogel',
+      street: 'Mollebakken 33',
+      location: '3650 Olstykke'
+    },
+    {
+      lat: 56.763202,
+      long: -1.308,
+      name: 'Tobias Vogel',
+      street: 'Mollebakken 33',
+      location: '3650 Olstykke'
+    },
+    {
+      lat: 56.863202,
+      long: -1.308,
+      name: 'Tobias Vogel',
+      street: 'Mollebakken 33',
+      location: '3650 Olstykke'
+    },
+    {
+      lat: 56.963202,
+      long: -1.308,
+      name: 'Tobias Vogel',
+      street: 'Mollebakken 33',
+      location: '3650 Olstykke'
+    },
+    {
+      lat: 57.973202,
+      long: -1.308,
+      name: 'Tobias Vogel',
+      street: 'Mollebakken 33',
+      location: '3650 Olstykke'
+    },
+    {
+      lat: 57.163202,
+      long: -1.308,
+      name: 'Tobias Vogel',
+      street: 'Mollebakken 33',
+      location: '3650 Olstykke'
+    },
+    {
+      lat: 51.163202,
+      long: -1.308,
+      name: 'Tobias Vogel',
+      street: 'Mollebakken 33',
+      location: '3650 Olstykke'
+    },
+    {
+      lat: 51.263202,
+      long: -1.308,
+      name: 'Tobias Vogel',
+      street: 'Mollebakken 33',
+      location: '3650 Olstykke'
+    },
+    {
+      lat: 51.363202,
+      long: -1.308,
+      name: 'Tobias Vogel',
+      street: 'Mollebakken 33',
+      location: '3650 Olstykke'
+    },
+    {
+      lat: 51.409,
+      long: -2.647,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 53.68,
+      long: -1.49,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 50.259998,
+      long: -5.051,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 54.906101,
+      long: -1.38113,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 53.383331,
+      long: -1.466667,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 53.483002,
+      long: -2.2931,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 51.509865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 51.109865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 51.209865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 51.309865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 51.409865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 51.609865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 51.709865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 51.809865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 51.909865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 52.109865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 52.209865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 52.309865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 52.409865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 52.509865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 52.609865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 52.709865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 52.809865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 52.909865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 52.519865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 52.529865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 52.539865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 53.549865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 52.549865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 53.109865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 53.209865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 53.319865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 53.329865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 53.409865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 53.559865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 53.619865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 53.629865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 53.639865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 53.649865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 53.669865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 53.669865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 53.719865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 53.739865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 53.749865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 53.759865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 53.769865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 53.769865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 53.819865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 53.829865,
+      long: -0.118092,
+      name: 'Richard Hendricks',
+      street: '37 Seafield Place',
+      location: 'London'
+    },
+    {
+      lat: 53.483959,
+      long: -2.244644,
+      name: 'Ethel B. Brooks',
+      street: '2576 Sun Valley Road'
+    },
+    {
+      lat: 40.737,
+      long: -73.923,
+      name: 'Marshall D. Lewis',
+      street: '1489 Michigan Avenue',
+      location: 'Michigan'
+    },
+    {
+      lat: 39.737,
+      long: -73.923,
+      name: 'Marshall D. Lewis',
+      street: '1489 Michigan Avenue',
+      location: 'Michigan'
+    },
+    {
+      lat: 38.737,
+      long: -73.923,
+      name: 'Marshall D. Lewis',
+      street: '1489 Michigan Avenue',
+      location: 'Michigan'
+    },
+    {
+      lat: 37.737,
+      long: -73.923,
+      name: 'Marshall D. Lewis',
+      street: '1489 Michigan Avenue',
+      location: 'Michigan'
+    },
+    {
+      lat: 40.737,
+      long: -73.923,
+      name: 'Marshall D. Lewis',
+      street: '1489 Michigan Avenue',
+      location: 'Michigan'
+    },
+    {
+      lat: 41.737,
+      long: -73.923,
+      name: 'Marshall D. Lewis',
+      street: '1489 Michigan Avenue',
+      location: 'Michigan'
+    },
+    {
+      lat: 42.737,
+      long: -73.923,
+      name: 'Marshall D. Lewis',
+      street: '1489 Michigan Avenue',
+      location: 'Michigan'
+    },
+    {
+      lat: 43.737,
+      long: -73.923,
+      name: 'Marshall D. Lewis',
+      street: '1489 Michigan Avenue',
+      location: 'Michigan'
+    },
+    {
+      lat: 44.737,
+      long: -73.923,
+      name: 'Marshall D. Lewis',
+      street: '1489 Michigan Avenue',
+      location: 'Michigan'
+    },
+    {
+      lat: 45.737,
+      long: -73.923,
+      name: 'Marshall D. Lewis',
+      street: '1489 Michigan Avenue',
+      location: 'Michigan'
+    },
+    {
+      lat: 46.7128,
+      long: 74.006,
+      name: 'Elizabeth C. Lyons',
+      street: '4553 Kenwood Place',
+      location: 'Fort Lauderdale'
+    },
+    {
+      lat: 40.7128,
+      long: 74.1181,
+      name: 'Elizabeth C. Lyons',
+      street: '4553 Kenwood Place',
+      location: 'Fort Lauderdale'
+    },
+    {
+      lat: 14.235,
+      long: 51.9253,
+      name: 'Ralph D. Wylie',
+      street: '3186 Levy Court',
+      location: 'North Reading'
+    },
+    {
+      lat: 15.235,
+      long: 51.9253,
+      name: 'Ralph D. Wylie',
+      street: '3186 Levy Court',
+      location: 'North Reading'
+    },
+    {
+      lat: 16.235,
+      long: 51.9253,
+      name: 'Ralph D. Wylie',
+      street: '3186 Levy Court',
+      location: 'North Reading'
+    },
+    {
+      lat: 14.235,
+      long: 51.9253,
+      name: 'Ralph D. Wylie',
+      street: '3186 Levy Court',
+      location: 'North Reading'
+    },
+    {
+      lat: 15.8267,
+      long: 47.9218,
+      name: 'Hope A. Atkins',
+      street: '3715 Hillcrest Drive',
+      location: 'Seattle'
+    },
+    {
+      lat: 15.9267,
+      long: 47.9218,
+      name: 'Hope A. Atkins',
+      street: '3715 Hillcrest Drive',
+      location: 'Seattle'
+    },
+    {
+      lat: 23.4425,
+      long: 58.4438,
+      name: 'Samuel R. Bailey',
+      street: '2883 Raoul Wallenberg Place',
+      location: 'Cheshire'
+    },
+    {
+      lat: 23.5425,
+      long: 58.3438,
+      name: 'Samuel R. Bailey',
+      street: '2883 Raoul Wallenberg Place',
+      location: 'Cheshire'
+    },
+    {
+      lat: -37.8927369333,
+      long: 175.4087452333,
+      name: 'Samuel R. Bailey',
+      street: '3228 Glory Road',
+      location: 'Nashville'
+    },
+    {
+      lat: -38.9064188833,
+      long: 175.4441556833,
+      name: 'Samuel R. Bailey',
+      street: '3228 Glory Road',
+      location: 'Nashville'
+    },
+    {
+      lat: -12.409874,
+      long: -65.596832,
+      name: 'Ann J. Perdue',
+      street: '921 Ella Street',
+      location: 'Dublin'
+    },
+    {
+      lat: -22.090887,
+      long: -57.411827,
+      name: 'Jorge C. Woods',
+      street: '4800 North Bend River Road',
+      location: 'Allen'
+    },
+    {
+      lat: -19.019585,
+      long: -65.261963,
+      name: 'Russ E. Panek',
+      street: '4068 Hartland Avenue',
+      location: 'Appleton'
+    },
+    {
+      lat: -16.500093,
+      long: -68.214684,
+      name: 'Russ E. Panek',
+      street: '4068 Hartland Avenue',
+      location: 'Appleton'
+    },
+    {
+      lat: -17.413977,
+      long: -66.165321,
+      name: 'Russ E. Panek',
+      street: '4068 Hartland Avenue',
+      location: 'Appleton'
+    },
+    {
+      lat: -16.489689,
+      long: -68.119293,
+      name: 'Russ E. Panek',
+      street: '4068 Hartland Avenue',
+      location: 'Appleton'
+    },
+    {
+      lat: 54.766323,
+      long: 3.08603729,
+      name: 'Russ E. Panek',
+      street: '4068 Hartland Avenue',
+      location: 'Appleton'
+    },
+    {
+      lat: 54.866323,
+      long: 3.08603729,
+      name: 'Russ E. Panek',
+      street: '4068 Hartland Avenue',
+      location: 'Appleton'
+    },
+    {
+      lat: 49.537685,
+      long: 3.08603729,
+      name: 'Russ E. Panek',
+      street: '4068 Hartland Avenue',
+      location: 'Appleton'
+    },
+    {
+      lat: 54.715424,
+      long: 0.509207,
+      name: 'Russ E. Panek',
+      street: '4068 Hartland Avenue',
+      location: 'Appleton'
+    },
+    {
+      lat: 44.891666,
+      long: 10.136665,
+      name: 'Russ E. Panek',
+      street: '4068 Hartland Avenue',
+      location: 'Appleton'
+    },
+    {
+      lat: 48.078335,
+      long: 14.535004,
+      name: 'Russ E. Panek',
+      street: '4068 Hartland Avenue',
+      location: 'Appleton'
+    },
+    {
+      lat: -26.358055,
+      long: 27.398056,
+      name: 'Russ E. Panek',
+      street: '4068 Hartland Avenue',
+      location: 'Appleton'
+    },
+    {
+      lat: -29.1,
+      long: 26.2167,
+      name: 'Wilbur J. Dry',
+      street: '2043 Jadewood Drive',
+      location: 'Northbrook'
+    },
+    {
+      lat: -29.883333,
+      long: 31.049999,
+      name: 'Wilbur J. Dry',
+      street: '2043 Jadewood Drive',
+      location: 'Northbrook'
+    },
+    {
+      lat: -26.266111,
+      long: 27.865833,
+      name: 'Wilbur J. Dry',
+      street: '2043 Jadewood Drive',
+      location: 'Northbrook'
+    },
+    {
+      lat: -29.087217,
+      long: 26.154898,
+      name: 'Wilbur J. Dry',
+      street: '2043 Jadewood Drive',
+      location: 'Northbrook'
+    },
+    {
+      lat: -33.958252,
+      long: 25.619022,
+      name: 'Wilbur J. Dry',
+      street: '2043 Jadewood Drive',
+      location: 'Northbrook'
+    },
+    {
+      lat: -33.977074,
+      long: 22.457581,
+      name: 'Wilbur J. Dry',
+      street: '2043 Jadewood Drive',
+      location: 'Northbrook'
+    },
+    {
+      lat: -26.563404,
+      long: 27.844164,
+      name: 'Wilbur J. Dry',
+      street: '2043 Jadewood Drive',
+      location: 'Northbrook'
+    },
+    {
+      lat: 51.21389,
+      long: -102.462776,
+      name: 'Joseph B. Poole',
+      street: '3364 Lunetta Street',
+      location: 'Wichita Falls'
+    },
+    {
+      lat: 52.321945,
+      long: -106.584167,
+      name: 'Joseph B. Poole',
+      street: '3364 Lunetta Street',
+      location: 'Wichita Falls'
+    },
+    {
+      lat: 50.288055,
+      long: -107.793892,
+      name: 'Joseph B. Poole',
+      street: '3364 Lunetta Street',
+      location: 'Wichita Falls'
+    },
+    {
+      lat: 52.7575,
+      long: -108.28611,
+      name: 'Joseph B. Poole',
+      street: '3364 Lunetta Street',
+      location: 'Wichita Falls'
+    },
+    {
+      lat: 50.393333,
+      long: -105.551941,
+      name: 'Joseph B. Poole',
+      street: '3364 Lunetta Street',
+      location: 'Wichita Falls'
+    },
+    {
+      lat: 50.930557,
+      long: -102.807777,
+      name: 'Joseph B. Poole',
+      street: '3364 Lunetta Street',
+      location: 'Wichita Falls'
+    },
+    {
+      lat: 52.856388,
+      long: -104.610001,
+      name: 'Joseph B. Poole',
+      street: '3364 Lunetta Street',
+      location: 'Wichita Falls'
+    },
+    {
+      lat: 52.289722,
+      long: -106.666664,
+      name: 'Joseph B. Poole',
+      street: '3364 Lunetta Street',
+      location: 'Wichita Falls'
+    },
+    {
+      lat: 52.201942,
+      long: -105.123055,
+      name: 'Joseph B. Poole',
+      street: '3364 Lunetta Street',
+      location: 'Wichita Falls'
+    },
+    {
+      lat: 53.278046,
+      long: -110.00547,
+      name: 'Joseph B. Poole',
+      street: '3364 Lunetta Street',
+      location: 'Wichita Falls'
+    },
+    {
+      lat: 49.13673,
+      long: -102.990959,
+      name: 'Joseph B. Poole',
+      street: '3364 Lunetta Street',
+      location: 'Wichita Falls'
+    },
+    {
+      lat: 45.484531,
+      long: -73.597023,
+      name: 'Claudette D. Nowakowski',
+      street: '3742 Farland Avenue',
+      location: 'San Antonio'
+    },
+    {
+      lat: 45.266666,
+      long: -71.900002,
+      name: 'Claudette D. Nowakowski',
+      street: '3742 Farland Avenue',
+      location: 'San Antonio'
+    },
+    {
+      lat: 45.349998,
+      long: -72.51667,
+      name: 'Claudette D. Nowakowski',
+      street: '3742 Farland Avenue',
+      location: 'San Antonio'
+    },
+    {
+      lat: 47.333332,
+      long: -79.433334,
+      name: 'Claudette D. Nowakowski',
+      street: '3742 Farland Avenue',
+      location: 'San Antonio'
+    },
+    {
+      lat: 45.400002,
+      long: -74.033333,
+      name: 'Claudette D. Nowakowski',
+      street: '3742 Farland Avenue',
+      location: 'San Antonio'
+    },
+    {
+      lat: 45.683334,
+      long: -73.433334,
+      name: 'Claudette D. Nowakowski',
+      street: '3742 Farland Avenue',
+      location: 'San Antonio'
+    },
+    {
+      lat: 48.099998,
+      long: -77.783333,
+      name: 'Claudette D. Nowakowski',
+      street: '3742 Farland Avenue',
+      location: 'San Antonio'
+    },
+    {
+      lat: 45.5,
+      long: -72.316666,
+      name: 'Claudette D. Nowakowski',
+      street: '3742 Farland Avenue',
+      location: 'San Antonio'
+    },
+    {
+      lat: 46.349998,
+      long: -72.550003,
+      name: 'Claudette D. Nowakowski',
+      street: '3742 Farland Avenue',
+      location: 'San Antonio'
+    },
+    {
+      lat: 48.119999,
+      long: -69.18,
+      name: 'Claudette D. Nowakowski',
+      street: '3742 Farland Avenue',
+      location: 'San Antonio'
+    },
+    {
+      lat: 45.599998,
+      long: -75.25,
+      name: 'Claudette D. Nowakowski',
+      street: '3742 Farland Avenue',
+      location: 'San Antonio'
+    },
+    {
+      lat: 46.099998,
+      long: -71.300003,
+      name: 'Claudette D. Nowakowski',
+      street: '3742 Farland Avenue',
+      location: 'San Antonio'
+    },
+    {
+      lat: 45.700001,
+      long: -73.633331,
+      name: 'Claudette D. Nowakowski',
+      street: '3742 Farland Avenue',
+      location: 'San Antonio'
+    },
+    {
+      lat: 47.68,
+      long: -68.879997,
+      name: 'Claudette D. Nowakowski',
+      street: '3742 Farland Avenue',
+      location: 'San Antonio'
+    },
+    {
+      lat: 46.716667,
+      long: -79.099998,
+      name: '299'
+    },
+    {
+      lat: 45.016666,
+      long: -72.099998,
+      name: '299'
+    }
+  ];
+
+  const { L } = window;
+
+  /* -------------------------------------------------------------------------- */
+  /*                                   leaflet                                  */
+  /* -------------------------------------------------------------------------- */
+
+  const leafletInit = () => {
+    const mapContainer = document.getElementById('map');
+    if (L && mapContainer) {
+      const getFilterColor = () => {
+        return window.config.config.phoenixTheme === 'dark'
+          ? [
+              'invert:98%',
+              'grayscale:69%',
+              'bright:89%',
+              'contrast:111%',
+              'hue:205deg',
+              'saturate:1000%'
+            ]
+          : ['bright:101%', 'contrast:101%', 'hue:23deg', 'saturate:225%'];
+      };
+      const tileLayerTheme =
+        'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+
+      const tiles = L.tileLayer.colorFilter(tileLayerTheme, {
+        attribution: null,
+        transparent: true,
+        filter: getFilterColor()
+      });
+
+      const map = L.map('map', {
+        center: L.latLng(25.659195, 30.182691),
+        zoom: 0.6,
+        layers: [tiles],
+        minZoom: 1.4
+      });
+
+      const mcg = L.markerClusterGroup({
+        chunkedLoading: false,
+        spiderfyOnMaxZoom: false
+      });
+
+      leaftletPoints.map(point => {
+        const { name, location, street } = point;
+        const icon = L.icon({
+          iconUrl: `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAApCAYAAADAk4LOAAAACXBIWXMAAAFgAAABYAEg2RPaAAADpElEQVRYCZ1XS1LbQBBtybIdiMEJKSpUqihgEW/xDdARyAnirOIl3MBH8NK7mBvkBpFv4Gy9IRSpFIQiRPyNfqkeZkY9HwmFt7Lm06+7p/vN2MmyDIrQ6QebALAHAD4AbFuWfQeAAACGs5H/w5jlsJJw4wMA+GhMFuMA99jIDJJOP+ihZwDQFmNuowWO1wS3viDXpdEdZPEc0odruj0EgN5s5H8tJOEEX8R3rbkMtcU34NTqhe5nSQTJ7Tkk80s6/Gk28scGiULguFBffgdufdEwWoQ0uoXo8hdAlooVH0REjISfwZSlyHGh0V5n6aHAtKTxXI5g6nQnMH0P4bEgwtR18Yw8Pj8QZ4ARUAI0Hl+fQZZGisGEBVwHr7XKzox57DXZ/ij8Cdwe2u057z9/wygOxRl4S2vSUHx1oucaMQGAHTrgtdag9mK5aN+Wx/uAAQ9Zenp/SRce4TpaNbQK4+sTcGqeTB/aIXv3XN5oj2VKqii++U0JunpZ8urxee4hvjqVc2hHpBDXuKKT9XMgVYJ1/1fPGSeaikzgmWWkMIi9bVf8UhotXxzORn5gWFchI8QyttlzjS0qpsaIGY2MMsujV/AUSdcY0dDpB6/EiOPYzclR1CI5mOez3ekHvrFLxa7cR5pTscfrXjk0Vhm5V2PqLUWnH3R5GbPGpMVD7E1ckXesKBQ7AS/vmQ1c0+kHuxpBj98lTCm8pbc5QRJRdZ6qHb/wGryXq3Lxszv+5gySuwvxueXySwYvHEjuQ9ofTGKYlrmK1EsCHMd5SoD7mZ1HHFCBHLNbMEshvrugqWLn01hpVVJhFgVGkDvK7hR6n2B+d9C7xsqWsbkqHv4cCsWezEb+o2SR+SFweUBxfA5wH7kShjKt2vWL57Px3GhIFEezkb8pxvUWHYhotAfCk2AtkEcxoOttrxUWDR5svb1emSQKj0WXK1HYIgFREbiBqmoZcB2RkbE+byMZiosorVgAZF1ID7yQhEs38wa7nUqNDezdlavC2HbBGSQkGgZ8uJVBmzeiKCRRpEa9ilWghORVeGB7BxeSKF5xqbFBkxBrFKUk/JHA7ppENQaCnCjthK+3opCEYyANztXmZN858cDYWSUSHk3A311GAZDvo6deNKUk1EsqnJoQlkYBNlmxQZeaMgmxoUokICoHDce351RCCiuKoirJWEgNOYvQplM2VCLhUqF7jf94rW9kHVUjQeheV4riv0i4ZOzzz/2y/+0KAOAfr4EE4HpCFhwAAAAASUVORK5CYII=`
+        });
+        const marker = L.marker([point.lat, point.long], {
+          icon
+        });
+        const popupContent = `
+        <h6 class="mb-1">${name}</h6>
+        <p class="m-0 text-body-quaternary">${street}, ${location}</p>
+      `;
+        const popup = L.popup({ minWidth: 180 }).setContent(popupContent);
+        marker.bindPopup(popup);
+        mcg.addLayer(marker);
+        return true;
+      });
+      map.addLayer(mcg);
+
+      const themeController = document.body;
+      themeController.addEventListener(
+        'clickControl',
+        ({ detail: { control, value } }) => {
+          if (control === 'phoenixTheme') {
+            tiles.updateFilter(
+              value === 'dark'
+                ? [
+                    'invert:98%',
+                    'grayscale:69%',
+                    'bright:89%',
+                    'contrast:111%',
+                    'hue:205deg',
+                    'saturate:1000%'
+                  ]
+                : ['bright:101%', 'contrast:101%', 'hue:23deg', 'saturate:225%']
+            );
+          }
+        }
+      );
+    }
+  };
+
+  /* -------------------------------------------------------------------------- */
+  /*                                   mapbox cluster                                  */
+  /* -------------------------------------------------------------------------- */
+
+  const mapboxClusterInit = () => {
+    const mapboxCluster = document.querySelectorAll('#mapbox-cluster');
+    if (mapboxCluster) {
+      mapboxCluster.forEach(() => {
+        window.mapboxgl.accessToken =
+          'pk.eyJ1IjoidGhlbWV3YWdvbiIsImEiOiJjbGhmNW5ybzkxcmoxM2RvN2RmbW1nZW90In0.hGIvQ890TYkZ948MVrsMIQ';
+
+        const styles = {
+          default: 'mapbox://styles/mapbox/light-v11',
+          light: 'mapbox://styles/themewagon/clj57pads001701qo25756jtw',
+          dark: 'mapbox://styles/themewagon/cljzg9juf007x01pk1bepfgew'
+        };
+
+        const map = new window.mapboxgl.Map({
+          container: 'mapbox-cluster',
+          style: styles[window.config.config.phoenixTheme],
+          center: [-73.102712, 7.102257],
+          zoom: 3.5,
+          pitch: 40,
+          attributionControl: false
+        });
+
+        map.on('load', () => {
+          map.addSource('earthquakes', {
+            type: 'geojson',
+            data: 'https://docs.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson',
+            cluster: true,
+            clusterMaxZoom: 14,
+            clusterRadius: 50
+          });
+
+          map.addLayer({
+            id: 'clusters',
+            type: 'circle',
+            source: 'earthquakes',
+            filter: ['has', 'point_count'],
+            paint: {
+              'circle-color': [
+                'step',
+                ['get', 'point_count'],
+                getColor('secondary'),
+                100,
+                getColor('info'),
+                750,
+                getColor('warning')
+              ],
+              'circle-radius': [
+                'step',
+                ['get', 'point_count'],
+                20,
+                100,
+                30,
+                750,
+                40
+              ]
+            }
+          });
+
+          map.addLayer({
+            id: 'cluster-count',
+            type: 'symbol',
+            source: 'earthquakes',
+            filter: ['has', 'point_count'],
+            layout: {
+              'text-field': ['get', 'point_count_abbreviated'],
+              'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+              'text-size': 12
+            },
+            paint: {
+              'text-color': getColor('white')
+            }
+          });
+
+          map.addLayer({
+            id: 'unclustered-point',
+            type: 'circle',
+            source: 'earthquakes',
+            filter: ['!', ['has', 'point_count']],
+            paint: {
+              'circle-color': getColor('primary-light'),
+              'circle-radius': 4,
+              'circle-stroke-width': 1,
+              'circle-stroke-color': getColor('emphasis-bg')
+            }
+          });
+
+          map.on('click', 'clusters', e => {
+            const features = map.queryRenderedFeatures(e.point, {
+              layers: ['clusters']
+            });
+            const clusterId = features[0].properties.cluster_id;
+            map
+              .getSource('earthquakes')
+              .getClusterExpansionZoom(clusterId, (err, zoom) => {
+                if (err) return;
+
+                map.easeTo({
+                  center: features[0].geometry.coordinates,
+                  zoom
+                });
+              });
+          });
+
+          map.on('click', 'unclustered-point', e => {
+            const coordinates = e.features[0].geometry.coordinates.slice();
+            const { mag } = e.features[0].properties;
+            const tsunami = e.features[0].properties.tsunami === 1 ? 'yes' : 'no';
+
+            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+              coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+            }
+
+            new window.mapboxgl.Popup()
+              .setLngLat(coordinates)
+              .setHTML(`magnitude: ${mag}<br>Was there a tsunami?: ${tsunami}`)
+              .addTo(map);
+          });
+
+          map.on('mouseenter', 'clusters', () => {
+            map.getCanvas().style.cursor = 'pointer';
+          });
+          map.on('mouseleave', 'clusters', () => {
+            map.getCanvas().style.cursor = '';
+          });
+        });
+      });
+    }
+  };
+
+  const themeController = document.body;
+  if (themeController) {
+    themeController.addEventListener('clickControl', () => {
+      mapboxClusterInit();
+    });
+  }
+
+  /* -------------------------------------------------------------------------- */
+  /*                             Echarts trip review                            */
+  /* -------------------------------------------------------------------------- */
+
+  const { echarts } = window;
+
+  const tripReviewChartInit = () => {
+    const { getData, getColor } = window.phoenix.utils;
+    const $echartTripReviews = document.querySelectorAll('.echart-trip-review');
+
+    if ($echartTripReviews) {
+      $echartTripReviews.forEach($echartTripReview => {
+        const userOptions = getData($echartTripReview, 'options');
+        const chart = echarts.init($echartTripReview);
+
+        const getDefaultOptions = () => ({
+          tooltip: {
+            trigger: 'item',
+            padding: [7, 10],
+            backgroundColor: getColor('body-highlight-bg'),
+            borderColor: getColor('border-color'),
+            textStyle: { color: getColor('light-text-emphasis') },
+            borderWidth: 1,
+            position: (...params) => handleTooltipPosition(params),
+            transitionDuration: 0,
+            formatter: params => {
+              return `<strong>${params.seriesName}:</strong> ${params.value}%`;
+            },
+            extraCssText: 'z-index: 1000'
+          },
+          series: [
+            {
+              type: 'gauge',
+              name: 'Commission',
+              startAngle: 90,
+              endAngle: -270,
+              radius: '90%',
+              pointer: {
+                show: false
+              },
+              progress: {
+                show: true,
+                overlap: false,
+                // roundCap: true,
+                clip: false,
+                itemStyle: {
+                  color: getColor('primary')
+                }
+              },
+              axisLine: {
+                lineStyle: {
+                  width: 4,
+                  color: [[1, getColor('secondary-bg')]]
+                }
+              },
+              splitLine: {
+                show: false
+              },
+              axisTick: {
+                show: false
+              },
+              axisLabel: {
+                show: false
+              },
+              detail: {
+                fontSize: '20px',
+                color: getColor('body-color'),
+                offsetCenter: [0, '10%']
+              }
+            }
+          ]
+        });
+
+        echartSetOption(chart, userOptions, getDefaultOptions);
+      });
+    }
+  };
+
+  const playOnHoverInit = () => {
+    const isPause = (playIcon, pauseIcon) => {
+      playIcon.classList.add('d-block');
+      pauseIcon.classList.add('d-none');
+      playIcon.classList.remove('d-none');
+      pauseIcon.classList.remove('d-block');
+    };
+
+    const isPlay = (playIcon, pauseIcon) => {
+      playIcon.classList.add('d-none');
+      pauseIcon.classList.add('d-block');
+      playIcon.classList.remove('d-block');
+      pauseIcon.classList.remove('d-none');
+    };
+
+    const playVideo = (video, playIcon, pauseIcon) => {
+      video.play();
+      isPlay(playIcon, pauseIcon);
+    };
+
+    const pauseVideo = (video, playIcon, pauseIcon) => {
+      video.pause();
+      isPause(playIcon, pauseIcon);
+    };
+
+    const controlIsContainer = (container, state) => {
+      const video = container.querySelector('[data-play-on-hover]');
+      const controller = container.querySelector('[data-video-controller]');
+      if (controller) {
+        const playIcon = controller.querySelector('.play-icon');
+        const pauseIcon = controller.querySelector('.pause-icon');
+        if (state === 'play') {
+          playVideo(video, playIcon, pauseIcon);
+        } else {
+          pauseVideo(video, playIcon, pauseIcon);
+        }
+      }
+    };
+
+    document.addEventListener('mouseover', e => {
+      if (e.target.closest('[data-play-on-hover]')) {
+        const video = e.target.closest('[data-play-on-hover]');
+        playVideo(video, null, null);
+      } else if (e.target.closest('[data-play-on-container-hover]')) {
+        const container = e.target.closest('[data-play-on-container-hover]');
+        controlIsContainer(container, 'play');
+      }
+    });
+
+    document.addEventListener('mouseout', e => {
+      if (e.target.closest('[data-play-on-hover]')) {
+        const video = e.target.closest('[data-play-on-hover]');
+        pauseVideo(video, null, null);
+      } else if (e.target.closest('[data-play-on-container-hover]')) {
+        const container = e.target.closest('[data-play-on-container-hover]');
+        controlIsContainer(container, 'pause');
+      }
+    });
+
+    document.addEventListener('touchstart', e => {
+      if (e.target.closest('[data-play-on-hover]')) {
+        const video = e.target.closest('[data-play-on-hover]');
+        playVideo(video, null, null);
+      } else if (e.target.closest('[data-play-on-container-hover]')) {
+        const container = e.target.closest('[data-play-on-container-hover]');
+        controlIsContainer(container, 'play');
+      }
+    });
+
+    document.addEventListener('touchend', e => {
+      if (e.target.closest('[data-play-on-hover]')) {
+        const video = e.target.closest('[data-play-on-hover]');
+        pauseVideo(video, null, null);
+      } else if (e.target.closest('[data-play-on-container-hover]')) {
+        const container = e.target.closest('[data-play-on-container-hover]');
+        controlIsContainer(container, 'pause');
+      }
+    });
+
+    document.addEventListener('click', e => {
+      if (e.target.closest('[data-video-controller]')) {
+        const controller = e.target.closest('[data-video-controller]');
+        const container = controller.closest('[data-play-on-container-hover]');
+        const video = container.querySelector('[data-play-on-hover]');
+        const playIcon = controller.querySelector('.play-icon');
+        const pauseIcon = controller.querySelector('.pause-icon');
+
+        if (video.paused) {
+          playVideo(video, playIcon, pauseIcon);
+        } else {
+          pauseVideo(video, playIcon, pauseIcon);
+        }
+      }
+    });
+
+    const videoContainers = document.querySelectorAll(
+      '[data-play-on-container-hover]'
+    );
+    videoContainers.forEach(container => {
+      const video = container.querySelector('[data-play-on-hover]');
+      const controller = container.querySelector('[data-video-controller]');
+      if (controller) {
+        const playIcon = controller.querySelector('.play-icon');
+        const pauseIcon = controller.querySelector('.pause-icon');
+
+        if (video.paused) {
+          isPause(playIcon, pauseIcon);
+        }
+      }
+    });
+  };
+
+  const passwordToggleInit = () => {
+    const passwords = document.querySelectorAll('[data-password]');
+    if (passwords) {
+      passwords.forEach(password => {
+        const passwordInput = password.querySelector('[data-password-input]');
+        const passwordToggler = password.querySelector('[data-password-toggle]');
+        passwordToggler.addEventListener('click', () => {
+          if (passwordInput.type === 'password') {
+            passwordInput.setAttribute('type', 'text');
+            passwordToggler.classList.add('show-password');
+          } else {
+            passwordInput.setAttribute('type', 'password');
+            passwordToggler.classList.remove('show-password');
+          }
+        });
+      });
+    }
+  };
+
+  /* -------------------------------------------------------------------------- */
+  /*                                   Treeview                                  */
+  /* -------------------------------------------------------------------------- */
+  const treeviewInit = () => {
+    const Events = {
+      CHANGE: 'change',
+      SHOW_BS_COLLAPSE: 'show.bs.collapse',
+      HIDE_BS_COLLAPSE: 'hide.bs.collapse'
+    };
+
+    const Selector = {
+      TREEVIEW_ROW:
+        '.treeview > li > .treeview-row,.treeview-list.collapse-show > li > .treeview-row',
+      TREEVIEW: '.treeview',
+      TREEVIEW_LIST: '.treeview-list',
+      TOGGLE_ELEMENT: "[data-bs-toggle='collapse']",
+      INPUT: 'input',
+      TREEVIEW_LIST_ITEM: '.treeview-list-item',
+      CHILD_SELECTOR: ':scope > li > .collapse.collapse-show'
+    };
+
+    const ClassName = {
+      TREEVIEW: 'treeview',
+      TREEVIEW_LIST: 'treeview-list',
+      TREEVIEW_BORDER: 'treeview-border',
+      TREEVIEW_BORDER_TRANSPARENT: 'treeview-border-transparent',
+      COLLAPSE_SHOW: 'collapse-show',
+      COLLAPSE_HIDDEN: 'collapse-hidden',
+      TREEVIEW_ROW: 'treeview-row',
+      TREEVIEW_ROW_ODD: 'treeview-row-odd',
+      TREEVIEW_ROW_EVEN: 'treeview-row-even'
+    };
+
+    const treeviews = document.querySelectorAll(Selector.TREEVIEW);
+
+    const makeStriped = treeview => {
+      const tags = Array.from(treeview.querySelectorAll(Selector.TREEVIEW_ROW));
+
+      const uTags = tags.filter(tag => {
+        let result = true;
+        while (tag.parentElement) {
+          if (tag.parentElement.classList.contains(ClassName.COLLAPSE_HIDDEN)) {
+            result = false;
+            break;
+          }
+          tag = tag.parentElement;
+        }
+        return result;
+      });
+      uTags.forEach((tag, index) => {
+        if (index % 2 === 0) {
+          tag.classList.add(ClassName.TREEVIEW_ROW_EVEN);
+          tag.classList.remove(ClassName.TREEVIEW_ROW_ODD);
+        } else {
+          tag.classList.add(ClassName.TREEVIEW_ROW_ODD);
+          tag.classList.remove(ClassName.TREEVIEW_ROW_EVEN);
+        }
+      });
+    };
+
+    if (treeviews.length) {
+      treeviews.forEach(treeview => {
+        const options = getData(treeview, 'options');
+        const striped = options?.striped;
+        const select = options?.select;
+
+        if (striped) {
+          makeStriped(treeview);
+        }
+
+        const collapseElementList = Array.from(
+          treeview.querySelectorAll(Selector.TREEVIEW_LIST)
+        );
+        const collapseListItem = Array.from(
+          treeview.querySelectorAll(Selector.TREEVIEW_LIST_ITEM)
+        );
+
+        collapseListItem.forEach(item => {
+          const wholeRow = document.createElement('div');
+          wholeRow.setAttribute('class', ClassName.TREEVIEW_ROW);
+          item.prepend(wholeRow);
+        });
+        collapseElementList.forEach(collapse => {
+          const collapseId = collapse.id;
+          if (!striped) {
+            collapse.classList.add(ClassName.TREEVIEW_BORDER);
+          }
+          collapse.addEventListener(Events.SHOW_BS_COLLAPSE, e => {
+            e.target.classList.remove(ClassName.COLLAPSE_HIDDEN);
+            e.target.classList.add(ClassName.COLLAPSE_SHOW);
+            if (striped) {
+              makeStriped(treeview);
+            }
+          });
+
+          collapse.addEventListener(Events.HIDE_BS_COLLAPSE, e => {
+            e.target.classList.add(ClassName.COLLAPSE_HIDDEN);
+            e.target.classList.remove(ClassName.COLLAPSE_SHOW);
+
+            if (striped) {
+              makeStriped(treeview);
+            } else {
+              const childs = e
+                .composedPath()[2]
+                .querySelectorAll(Selector.CHILD_SELECTOR);
+              if (
+                !e.composedPath()[2].classList.contains(ClassName.TREEVIEW) &&
+                childs.length === 0
+              ) {
+                e.composedPath()[2].classList.remove(
+                  ClassName.TREEVIEW_BORDER_TRANSPARENT
+                );
+              }
+            }
+          });
+
+          if (collapse.dataset.show === 'true') {
+            const parents = [collapse];
+            while (collapse.parentElement) {
+              if (
+                collapse.parentElement.classList.contains(ClassName.TREEVIEW_LIST)
+              ) {
+                parents.unshift(collapse.parentElement);
+              }
+              collapse = collapse.parentElement;
+            }
+            parents.forEach(collapseEl => {
+              // eslint-disable-next-line no-new
+              new window.bootstrap.Collapse(collapseEl, {
+                show: true
+              });
+            });
+          }
+
+          if (select) {
+            const inputElement = treeview.querySelector(
+              `input[data-target='#${collapseId}']`
+            );
+            inputElement.addEventListener(Events.CHANGE, e => {
+              const childInputElements = Array.from(
+                treeview
+                  .querySelector(`#${collapseId}`)
+                  .querySelectorAll(Selector.INPUT)
+              );
+              childInputElements.forEach(input => {
+                input.checked = e.target.checked;
+              });
+            });
+          }
+        });
       });
     }
   };
@@ -4492,9 +6655,11 @@
 
   window.initMap = initMap;
   docReady(detectorInit);
+  docReady(simplebarInit);
   docReady(toastInit);
   docReady(tooltipInit);
   docReady(featherIconsInit);
+  docReady(basicEchartsInit);
   docReady(bulkSelectInit);
   docReady(listInit);
   docReady(anchorJSInit);
@@ -4517,6 +6682,7 @@
   docReady(phoenixOffcanvasInit);
   docReady(todoOffcanvasInit);
   docReady(wizardInit);
+  docReady(reportsDetailsChartInit);
   docReady(glightboxInit);
   docReady(themeControl);
   docReady(searchInit);
@@ -4526,10 +6692,12 @@
   docReady(fullCalendarInit);
   docReady(picmoInit);
 
+  docReady(chatInit);
   docReady(modalInit);
   docReady(lottieInit);
   docReady(navbarShadowOnScrollInit);
   docReady(dropdownOnHover);
+  docReady(supportChatInit);
   docReady(sortableInit);
 
   docReady(copyLink);
@@ -4544,6 +6712,13 @@
   docReady(typedTextInit);
   docReady(priceTierFormInit);
   docReady(nouisliderInit);
+  docReady(collapseAllInit);
+  docReady(leafletInit);
+  docReady(mapboxClusterInit);
+  docReady(tripReviewChartInit);
+  docReady(playOnHoverInit);
+  docReady(passwordToggleInit);
+  docReady(treeviewInit);
 
   docReady(() => {
     const selectedRowsBtn = document.querySelector('[data-selected-rows]');
