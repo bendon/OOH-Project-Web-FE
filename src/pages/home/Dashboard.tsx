@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import  { useEffect, useState } from 'react'
 import { getUserAccount } from '../../data/lib'
 
 interface Organization {

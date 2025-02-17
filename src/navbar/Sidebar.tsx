@@ -1,5 +1,4 @@
 import { ArrowLeft, ArrowRight, ChartColumnStacked, ChartNoAxesCombined, FolderKanban, LayoutDashboard, MapPinHouse, SquarePlus } from 'lucide-react'
-import React from 'react'
 import { Link } from 'react-router'
 
 export default function Sidebar() {
