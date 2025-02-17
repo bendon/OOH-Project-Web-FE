@@ -8,10 +8,12 @@ WORKDIR /app
 COPY package*.json ./
 
 RUN rm -rf node_modules package-lock.json
+
+RUN npm install -g vite
 # Install dependencies
 RUN npm install
 
-RUN npm install -g vite
+
 RUN npm install vite --save-dev
 
 # Copy the rest of the app files
