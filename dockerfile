@@ -11,7 +11,7 @@ RUN rm -rf node_modules package-lock.json
 
 RUN npm cache clean --force
 
-RUN npm install -g npm@latest
+RUN npm install -g npm@10.9.1
 
 RUN npm install -g vite
 # Install dependencies
