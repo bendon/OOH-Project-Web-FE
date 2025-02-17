@@ -1,5 +1,5 @@
 # Use official Node.js image as base
-FROM node:20
+FROM node:20.17.0
 
 # Set working directory inside the container
 WORKDIR /app
@@ -22,4 +22,4 @@ RUN npm install -g vite
 EXPOSE 5173
 
 # Serve the app using Vite's production server
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "preview"]
