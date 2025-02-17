@@ -20,4 +20,4 @@ RUN npm run build
 EXPOSE 5173
 
 # Serve the app using Vite's production server
-CMD ["npm", "run", "preview"]
+CMD ["npm", "run", "dev"]
