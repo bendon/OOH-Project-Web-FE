@@ -16,6 +16,8 @@ COPY . .
 # Build the app for production
 RUN npm run build
 
+RUN npm install -g vite
+
 # Expose the port that the app will run on
 EXPOSE 5173
 
