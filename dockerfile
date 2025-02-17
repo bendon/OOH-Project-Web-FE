@@ -6,9 +6,10 @@ COPY package*.json ./
 
 RUN npm install
 
-RUN mv .env.example .env
 
 COPY . .
+
+COPY .env.example ./.env
 
 RUN npm run build
 
