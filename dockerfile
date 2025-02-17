@@ -9,6 +9,10 @@ COPY package*.json ./
 
 RUN rm -rf node_modules package-lock.json
 
+RUN npm cache clean --force
+
+RUN npm install -g npm@latest
+
 RUN npm install -g vite
 # Install dependencies
 RUN npm install
@@ -26,7 +30,7 @@ RUN npm run build
 
 
 # Expose the port that the app will run on
-EXPOSE 4173
+EXPOSE 5173
 
 # Serve the app using Vite's production server
 CMD ["npm", "run", "preview"]
