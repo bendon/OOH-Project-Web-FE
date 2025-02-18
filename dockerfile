@@ -31,7 +31,7 @@ COPY --from=builder /app/package.json /app/package-lock.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-COPY --from=builder /.env.production ./.env.production
+COPY --from=builder /app/.env.production ./.env.production
 
 # Set environment variable for production
 ENV NODE_ENV=production
