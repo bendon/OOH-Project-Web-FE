@@ -4,7 +4,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 # Copy package.json and install dependencies
 COPY package.json package-lock.json ./
-RUN npm ci 
+RUN npm i 
 # Copy project files
 COPY . .
 # Build Next.js application
