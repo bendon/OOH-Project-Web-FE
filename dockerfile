@@ -14,6 +14,8 @@ RUN npm ci
 COPY . .
 
 
+
+
 # Build the Next.js application
 RUN npm run build
 
@@ -23,7 +25,7 @@ RUN npm ci --omit=dev
 # Use a minimal Node.js runtime for the final image
 FROM node:20-alpine
 
-# Set working directory
+# # Set working directory
 WORKDIR /app
 
 # Copy only the necessary files from the builder stage
@@ -36,11 +38,14 @@ COPY --from=builder /app/.env.production ./.env.production
 # Set environment variable for production
 ENV NODE_ENV=production
 
+RUN npm install -g pm2
+
 # Expose port
 EXPOSE 3000
 
 # Start the Next.js application
 # CMD ["node", "node_modules/.bin/next", "start"]
-CMD ["node", ".next/standalone/server.js"]
+# CMD ["node", ".next/standalone/server.js"]
 # CMD ["npm", "run", "start"]
+CMD ["pm2", "start", "npm", "--name", "nextjs", "--", "start"]
 
