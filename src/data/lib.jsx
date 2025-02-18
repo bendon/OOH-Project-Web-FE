@@ -77,7 +77,7 @@ export async function authGoogleLogin(formData) {
 
     try {
         const id_token = formData.get('id_token')
-        const response = await fetch(getApiUrl()+'auth/google/verify', {
+        const response = await fetch(getApiUrl()+'/auth/google/verify', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ token: id_token }),
