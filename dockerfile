@@ -10,7 +10,7 @@ COPY package.json ./
 RUN npm install -g npm@11.1.0
 
 # Install dependencies
-RUN npm install
+RUN npm ci --omit=dev
 
 # Copy the rest of the application files
 COPY . .
