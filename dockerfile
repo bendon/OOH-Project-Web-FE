@@ -18,7 +18,7 @@ COPY . .
 RUN npm run build
 
 # Install production dependencies only
-RUN npm ci --omit=dev
+RUN npm i 
 
 # Use a minimal Node.js runtime for the final image
 FROM node:20.17.0-alpine
