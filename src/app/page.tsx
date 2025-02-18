@@ -8,7 +8,6 @@ export default function Home() {
             <div className="bg-holder" style={{backgroundImage: "url(/project/34.png)", backgroundPosition: "center"}}></div>
         </div>
         <div className="col-lg-6">
-          {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}
             <LoginForm/>
         </div>
     </div>
