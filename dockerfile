@@ -42,5 +42,5 @@ EXPOSE 3000
 # Start the Next.js application
 # CMD ["node", "node_modules/.bin/next", "start"]
 # CMD ["node", ".next/standalone/server.js"]
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start"]
 

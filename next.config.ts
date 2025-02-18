@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
     middlewarePrefetch: "strict", // Ensure middleware runs correctly
   },
   output: 'standalone',
+  turbo : false
   /* config options here */
 };
 
