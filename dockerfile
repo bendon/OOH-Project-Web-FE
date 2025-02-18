@@ -1,5 +1,5 @@
 # Use official Node.js image as the builder
-FROM node:20-alpine AS builder
+FROM node:20.17.0-alpine AS builder
 
 # Set working directory
 WORKDIR /app
@@ -21,7 +21,7 @@ RUN npm run build
 RUN npm ci --omit=dev
 
 # Use a minimal Node.js runtime for the final image
-FROM node:20-alpine
+FROM node:20.17.0-alpine
 
 # Set working directory
 WORKDIR /app
