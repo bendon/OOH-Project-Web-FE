@@ -1,51 +1,77 @@
-# Use official Node.js image as the builder
-FROM node:20-alpine AS builder
 
+FROM node:20-alpine AS builder
 # Set working directory
 WORKDIR /app
-
-# Copy package.json and package-lock.json
+# Copy package.json and install dependencies
 COPY package.json package-lock.json ./
-
-# Install dependencies
-RUN npm ci
-
-# Copy the rest of the application files
+RUN npm install --frozen-lockfile
+# Copy project files
 COPY . .
-
-
-
-
-# Build the Next.js application
+# Build Next.js application
 RUN npm run build
+# Production image
+FROM node:20-alpine AS runner
+WORKDIR /app
+# Copy built files
+COPY --from=builder /app/.next .next
+COPY --from=builder /app/public public
+COPY --from=builder /app/node_modules node_modules
+COPY --from=builder /app/package.json package.json
+COPY --from=builder /app/.env.production ./.env.production
+# Set environment variables
+ENV NODE_ENV=production
+EXPOSE 3000
+# Run the application
+CMD ["npm", "start"]
 
-# Install production dependencies only
-RUN npm ci --omit=dev
-
-# Use a minimal Node.js runtime for the final image
-FROM node:20-alpine
+# # Use official Node.js image as the builder
+# FROM node:20-alpine AS builder
 
 # # Set working directory
-WORKDIR /app
+# WORKDIR /app
 
-# Copy only the necessary files from the builder stage
-COPY --from=builder /app/package.json /app/package-lock.json ./
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.env.production ./.env.production
+# # Copy package.json and package-lock.json
+# COPY package.json package-lock.json ./
 
-# Set environment variable for production
-ENV NODE_ENV=production
+# # Install dependencies
+# RUN npm ci
 
-RUN npm install -g pm2
+# # Copy the rest of the application files
+# COPY . .
 
-# Expose port
-EXPOSE 3000
 
-# Start the Next.js application
-# CMD ["node", "node_modules/.bin/next", "start"]
-# CMD ["node", ".next/standalone/server.js"]
-CMD ["npm", "run", "dev"]
-# CMD ["pm2", "start", "npm", "--name", "nextjs", "--", "start"]
+
+
+# # Build the Next.js application
+# RUN npm run build
+
+# # Install production dependencies only
+# RUN npm ci --omit=dev
+
+# # Use a minimal Node.js runtime for the final image
+# FROM node:20-alpine
+
+# # # Set working directory
+# WORKDIR /app
+
+# # Copy only the necessary files from the builder stage
+# COPY --from=builder /app/package.json /app/package-lock.json ./
+# COPY --from=builder /app/node_modules ./node_modules
+# COPY --from=builder /app/.next ./.next
+# COPY --from=builder /app/public ./public
+# COPY --from=builder /app/.env.production ./.env.production
+
+# # Set environment variable for production
+# ENV NODE_ENV=production
+
+# RUN npm install -g pm2
+
+# # Expose port
+# EXPOSE 3000
+
+# # Start the Next.js application
+# # CMD ["node", "node_modules/.bin/next", "start"]
+# # CMD ["node", ".next/standalone/server.js"]
+# CMD ["npm", "run", "dev"]
+# # CMD ["pm2", "start", "npm", "--name", "nextjs", "--", "start"]
 
