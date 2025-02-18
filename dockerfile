@@ -20,18 +20,18 @@ RUN npm run build
 # Install production dependencies only
 RUN npm ci --omit=dev
 
-# Use a minimal Node.js runtime for the final image
-FROM node:20.17.0-alpine
+# # Use a minimal Node.js runtime for the final image
+# FROM node:20.17.0-alpine
 
-# Set working directory
-WORKDIR /app
+# # Set working directory
+# WORKDIR /app
 
-# Copy only the necessary files from the builder stage
-COPY --from=builder /app/package.json /app/package-lock.json ./
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.env.production ./.env.production
+# # Copy only the necessary files from the builder stage
+# COPY --from=builder /app/package.json /app/package-lock.json ./
+# COPY --from=builder /app/node_modules ./node_modules
+# COPY --from=builder /app/.next ./.next
+# COPY --from=builder /app/public ./public
+# COPY --from=builder /app/.env.production ./.env.production
 
 # Set environment variable for production
 ENV NODE_ENV=production
