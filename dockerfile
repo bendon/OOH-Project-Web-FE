@@ -1,7 +1,9 @@
-FROM node:20-alpine as base
+FROM node:20-alpine 
+
 WORKDIR /app
+
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
 COPY . .
 RUN npm run build
