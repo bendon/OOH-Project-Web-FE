@@ -42,5 +42,7 @@ ENV NODE_ENV=production
 EXPOSE 3000
 
 # Start the Next.js application
-CMD ["node", "node_modules/.bin/next", "start"]
+# CMD ["node", "node_modules/.bin/next", "start"]
 # CMD ["npm", "run", "dev"]
+CMD ["node", ".next/standalone/server.js"]
+
