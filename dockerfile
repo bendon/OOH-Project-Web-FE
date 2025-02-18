@@ -1,4 +1,4 @@
-# Use official Node.js image as base
+# Use official Node.js image as the builder
 FROM node:20-alpine AS builder
 
 # Set working directory
@@ -8,25 +8,36 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm ci
 
-# Copy the rest of the application code
+# Copy the rest of the application files
 COPY . .
+
 
 # Build the Next.js application
 RUN npm run build
 
-# Use a lightweight Nginx server
-FROM nginx:alpine
+# Install production dependencies only
+RUN npm ci --omit=dev
 
-# Copy the built Next.js app from the previous stage
-COPY --from=builder /app/.next /usr/share/nginx/html
+# Use a minimal Node.js runtime for the final image
+FROM node:20-alpine
 
-# Copy custom Nginx configuration
-COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+# Set working directory
+WORKDIR /app
 
-# Expose port 80
-EXPOSE 80
+# Copy only the necessary files from the builder stage
+COPY --from=builder /app/package.json /app/package-lock.json ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.env.production ./.env.production
 
-# Start Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Set environment variable for production
+ENV NODE_ENV=production
+
+# Expose port
+EXPOSE 3000
+
+# Start the Next.js application
+CMD ["node", "node_modules/.bin/next", "start"]
