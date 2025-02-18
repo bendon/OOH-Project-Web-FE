@@ -8,14 +8,14 @@ WORKDIR /app
 COPY package.json ./
 
 # Install dependencies
-RUN npm iinstall
+RUN npm install
 
 # Copy the rest of the application files
 COPY . .
 
 
 # # Build the Next.js application
-# RUN npm run build
+RUN npm run build
 
 # # Install production dependencies only
 # #RUN npm i 
@@ -41,4 +41,4 @@ EXPOSE 3000
 
 # Start the Next.js application
 # CMD ["node", "node_modules/.bin/next", "start"]
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "dev"]
