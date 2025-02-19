@@ -1,5 +1,6 @@
 import nookies from 'nookies'
 import CryptoJS from 'crypto-js';
+import axios from 'axios';
 
 const secretKey = "q9j3h87y23h87y23h87y23h87y23h87y"
 
@@ -11,6 +12,20 @@ export async function encryptText(text) {
 
 function getApiUrl() {
     return import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL : "/api"
+}
+
+export function convertToHumanReadable  (dateString) {
+    const date = new Date(dateString * 1000);
+    const options = {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric',
+        hour12: true
+    };
+    return date.toLocaleDateString('en-US', options);
 }
 
 export async function decryptText(text) {
@@ -32,14 +47,10 @@ export async function authLogin(formData) {
         
         const email = formData.get('email')
         const password = formData.get('password')
-        const response = await fetch(getApiUrl()+'/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
-        })
-        const data = await response.json()
-        console.log(data);
-        
+      
+        const {data} = await axios.post(getApiUrl()+'/login', { email, password })
+     
+      
         const expires = new Date(Date.now() + 6 * 60 * 60 * 1000)
         const sessionUser  = {
             token: data.accessToken,
@@ -63,9 +74,9 @@ export async function authLogin(formData) {
     } catch (err) {
        
         const res = {
-            status: 400,
+            status: err.status,
             data: null,
-            error: err
+            error: err.response ? err.response.data.message : 'Something went wrong'
         }
 
         return res
@@ -77,12 +88,11 @@ export async function authGoogleLogin(formData) {
 
     try {
         const id_token = formData.get('id_token')
-        const response = await fetch(getApiUrl()+'/auth/google/verify', {
-            method: 'POST',
+     
+        const { data } =  await axios.post(getApiUrl()+'/auth/google/verify', { token: id_token }, {
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token: id_token }),
+
         })
-        const data = await response.json()
         const expires = new Date(Date.now() + 6 * 60 * 60 * 1000)
 
         const session = {
@@ -100,9 +110,9 @@ export async function authGoogleLogin(formData) {
         return res
     } catch (err) {
         const res = {
-            status: 400,
+            status: err.status,
             data: null,
-            error: err
+            error: err.response ? err.response.data.message : 'Something went wrong'
         }
 
         return res
@@ -135,14 +145,13 @@ export async function getToken() {
 export async function getUserAccount() {
     try {
 
-        const response  = await fetch(getApiUrl()+'/en/accounts', {
-            method: 'GET',
+        const {data}  = await axios.get(getApiUrl()+'/en/accounts', {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${await getToken()}`
             },
         })
-        const data  = await response.json()
+
         const res = {
             status: 200,
             data: data,
@@ -153,11 +162,40 @@ export async function getUserAccount() {
 
     }catch(err){
         const res = {
-            status: 400,
+            status: err.status,
             data: null,
-            error: err
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+        return res
+    }
+}
+
+export async function getStaffs() {
+    try {
+
+        const {data}  = await axios.get(getApiUrl()+'/en/sl/staffs', {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            },
+        })
+
+        
+
+        const res = {
+            status: 200,
+            data: data,
+            error: null
         }
 
+        return res
+
+    }catch(err){
+        const res = {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
         return res
     }
 }
@@ -166,16 +204,12 @@ export async function postSwitchAccount(formData) {
     try {
 
         const accountId = formData.get('accountId') 
-
-        const response  = await fetch(getApiUrl()+'/en/switch/account', {
-            method: 'POST',
+        const {data}  = await axios.post(getApiUrl()+'/en/switch/account', { accountId }, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${await getToken()}`
             },
-            body: JSON.stringify({ accountId }),
         })
-        const data  = await response.json()
     
         const expires = new Date(Date.now() + 6 * 60 * 60 * 1000)
         const sessionUser  = {
@@ -200,9 +234,9 @@ export async function postSwitchAccount(formData) {
 
     }catch(err){
         const res = {
-            status: 400,
+            status: err.status,
             data: null,
-            error: err
+            error: err.response ? err.response.data.message : 'Something went wrong'
         }
 
         return res
@@ -233,5 +267,78 @@ export async function postUserLogOut() {
     }
 }
 
+
+export async function getRoles() {
+    try {
+
+        const {data}  = await axios.get(getApiUrl()+'/en/sl/roles', {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            },
+        })
+        return {
+            status: 200,
+            data: data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
+export async function createTeamMember(payload) {
+    try {
+
+        const {data}  = await axios.post(getApiUrl()+'/en/sl/new/staff', payload, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            },
+        })
+        console.log(data);
+        
+        return {
+            status: 200,
+            data: data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+export async function getUserAnalytics() {
+    try {
+
+        const {data}  = await axios.get(getApiUrl()+'/en/sl/organization/user/analytics', {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            },
+        })
+        return {
+            status: 200,
+            data: data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
 
 

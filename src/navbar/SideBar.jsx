@@ -1,6 +1,6 @@
-import { ArrowLeft, ArrowRight, ChartColumnStacked, ChartNoAxesCombined, FolderKanban, LayoutDashboard, MapPinHouse, SquarePlus } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ChartColumnStacked, ChartNoAxesCombined, FolderKanban, Key, LayoutDashboard, Lock, MapPinHouse, MonitorCog, ReceiptText, Shield, ShieldCheck, SquarePlus, UserPlus, UserRoundCog, Users } from 'lucide-react'
 import React from 'react'
-import { Link } from 'react-router'
+import { Link, NavLink } from 'react-router'
 
 export default function SideBar() {
   return (
@@ -13,28 +13,28 @@ export default function SideBar() {
                 <hr className="navbar-vertical-line" />
 
                 <div className="nav-item-wrapper">
-                    <Link  className="nav-link label-1" to="/" role="button" data-bs-toggle="" aria-expanded="false">
+                    <NavLink  className="nav-link label-1" to="/" role="button" data-bs-toggle="" aria-expanded="false">
                         <div className="d-flex align-items-center">
                             <span className="nav-link-icon"> <LayoutDashboard size={18} className='icon'/> </span>
                             <span className="nav-link-text-wrapper"><span className="nav-link-text">Analytics</span></span>
                         </div>
-                    </Link>
+                    </NavLink>
                 </div>
                 <div className="nav-item-wrapper">
-                    <Link className="nav-link label-1" href="/bill-board-analysis" role="button" data-bs-toggle="" aria-expanded="false">
+                    <NavLink className="nav-link label-1" to="/billboard-analysis" role="button" data-bs-toggle="" aria-expanded="false">
                         <div className="d-flex align-items-center">
                             <span className="nav-link-icon"> <ChartNoAxesCombined size={18} className='icon'/> </span>
                             <span className="nav-link-text-wrapper"><span className="nav-link-text">Billboards Analysis</span></span>
                         </div>
-                    </Link>
+                    </NavLink>
                 </div>
                 <div className="nav-item-wrapper">
-                    <Link className="nav-link label-1" href="/team-analysis" role="button" data-bs-toggle="" aria-expanded="false">
+                    <NavLink className="nav-link label-1" to="/team-analysis" role="button" data-bs-toggle="" aria-expanded="false">
                         <div className="d-flex align-items-center">
                             <span className="nav-link-icon"> <ChartColumnStacked size={18} className='icon'/> </span>
                             <span className="nav-link-text-wrapper"><span className="nav-link-text">Team Analysis</span></span>
                         </div>
-                    </Link>
+                    </NavLink>
                 </div>
               </li>
               <li className="nav-item">
@@ -42,28 +42,115 @@ export default function SideBar() {
                 <hr className="navbar-vertical-line" />
 
                 <div className="nav-item-wrapper">
-                    <Link className="nav-link label-1" to="/manage-boards" role="button" data-bs-toggle="" aria-expanded="false">
+                    <NavLink className="nav-link label-1" to="/manage-boards" role="button" data-bs-toggle="" aria-expanded="false">
                         <div className="d-flex align-items-center">
                             <span className="nav-link-icon"> <FolderKanban size={18} className='icon'/> </span>
                             <span className="nav-link-text-wrapper"><span className="nav-link-text">Manage Boards</span></span>
                         </div>
-                    </Link>
+                    </NavLink>
                 </div>
                 <div className="nav-item-wrapper">
-                    <Link className="nav-link label-1" to="/create-board" role="button" data-bs-toggle="" aria-expanded="false">
+                    <NavLink className="nav-link label-1" to="/create-board" role="button" data-bs-toggle="" aria-expanded="false">
                         <div className="d-flex align-items-center">
                             <span className="nav-link-icon"> <SquarePlus size={18} className='icon'/> </span>
                             <span className="nav-link-text-wrapper"><span className="nav-link-text">Create Bill Board</span></span>
                         </div>
-                    </Link>
+                    </NavLink>
                 </div>
                 <div className="nav-item-wrapper">
-                    <Link className="nav-link label-1" href="/manage-boards/map-location" role="button" data-bs-toggle="" aria-expanded="false">
+                    <NavLink className="nav-link label-1" to="/billboard-locations" role="button" data-bs-toggle="" aria-expanded="false">
                         <div className="d-flex align-items-center">
                             <span className="nav-link-icon"> <MapPinHouse size={18} className='icon'/> </span>
                             <span className="nav-link-text-wrapper"><span className="nav-link-text">Geolocations</span></span>
                         </div>
-                    </Link>
+                    </NavLink>
+                </div>
+              </li>
+              <li className="nav-item">
+                <p className="navbar-vertical-label">Team Management</p>
+                <hr className="navbar-vertical-line" />
+
+                <div className="nav-item-wrapper">
+                    <NavLink className="nav-link label-1" to="/team-management" role="button" data-bs-toggle="" aria-expanded="false">
+                        <div className="d-flex align-items-center">
+                            <span className="nav-link-icon"> <Users size={18} className='icon'/> </span>
+                            <span className="nav-link-text-wrapper"><span className="nav-link-text">Manage Team</span></span>
+                        </div>
+                    </NavLink>
+                </div>
+                <div className="nav-item-wrapper">
+                    <NavLink className="nav-link label-1" to="/create-team" role="button" data-bs-toggle="" aria-expanded="false">
+                        <div className="d-flex align-items-center">
+                            <span className="nav-link-icon"> <UserPlus size={18} className='icon'/> </span>
+                            <span className="nav-link-text-wrapper"><span className="nav-link-text">Create Member</span></span>
+                        </div>
+                    </NavLink>
+                </div>
+                <div className="nav-item-wrapper">
+                    <NavLink className="nav-link label-1" to="/team-permission" role="button" data-bs-toggle="" aria-expanded="false">
+                        <div className="d-flex align-items-center">
+                            <span className="nav-link-icon"> <Shield size={18} className='icon'/> </span>
+                            <span className="nav-link-text-wrapper"><span className="nav-link-text">Member Permissions</span></span>
+                        </div>
+                    </NavLink>
+                </div>
+              </li>
+              <li className="nav-item">
+                <p className="navbar-vertical-label">Administration</p>
+                <hr className="navbar-vertical-line" />
+
+                <div className="nav-item-wrapper">
+                    <NavLink className="nav-link label-1" to="/role-settings" role="button" data-bs-toggle="" aria-expanded="false">
+                        <div className="d-flex align-items-center">
+                            <span className="nav-link-icon"> <ShieldCheck size={18} className='icon'/> </span>
+                            <span className="nav-link-text-wrapper"><span className="nav-link-text">Role settings</span></span>
+                        </div>
+                    </NavLink>
+                </div>
+                <div className="nav-item-wrapper">
+                    <NavLink className="nav-link label-1" to="/system-settings" role="button" data-bs-toggle="" aria-expanded="false">
+                        <div className="d-flex align-items-center">
+                            <span className="nav-link-icon"> <MonitorCog size={18} className='icon'/> </span>
+                            <span className="nav-link-text-wrapper"><span className="nav-link-text">System Settings</span></span>
+                        </div>
+                    </NavLink>
+                </div>
+                <div className="nav-item-wrapper">
+                    <NavLink className="nav-link label-1" to="/term-policy" role="button" data-bs-toggle="" aria-expanded="false">
+                        <div className="d-flex align-items-center">
+                            <span className="nav-link-icon"> <ReceiptText size={18} className='icon'/> </span>
+                            <span className="nav-link-text-wrapper"><span className="nav-link-text">Terms & policy</span></span>
+                        </div>
+                    </NavLink>
+                </div>
+              </li>
+              <li className="nav-item">
+                <p className="navbar-vertical-label">User Profile</p>
+                <hr className="navbar-vertical-line" />
+
+                <div className="nav-item-wrapper">
+                    <NavLink className="nav-link label-1" to="/user-account" role="button" data-bs-toggle="" aria-expanded="false">
+                        <div className="d-flex align-items-center">
+                            <span className="nav-link-icon"> <UserRoundCog size={18} className='icon'/> </span>
+                            <span className="nav-link-text-wrapper"><span className="nav-link-text">Account</span></span>
+                        </div>
+                    </NavLink>
+                </div>
+                <div className="nav-item-wrapper">
+                    <NavLink className="nav-link label-1" to="/change-password" role="button" data-bs-toggle="" aria-expanded="false">
+                        <div className="d-flex align-items-center">
+                            <span className="nav-link-icon"> <Key size={18} className='icon'/> </span>
+                            <span className="nav-link-text-wrapper"><span className="nav-link-text">Change Password</span></span>
+                        </div>
+                    </NavLink>
+                </div>
+                <div className="nav-item-wrapper">
+                    <NavLink className="nav-link label-1" to="/team-permission" role="button" data-bs-toggle="" aria-expanded="false">
+                        <div className="d-flex align-items-center">
+                            <span className="nav-link-icon"> <Lock size={18} className='icon'/> </span>
+                            <span className="nav-link-text-wrapper"><span className="nav-link-text">Logout</span></span>
+                        </div>
+                    </NavLink>
                 </div>
               </li>
             </ul>

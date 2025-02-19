@@ -1,10 +1,27 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import DashboardChart from '../../charts/DashboardChart'
 import { Presentation, User } from 'lucide-react'
 import GoogleMap from '../../components/GoogleMapComponent'
 import GoogleMapComponent from '../../components/GoogleMapComponent'
+import { getUserAnalytics } from '../../data/lib'
 
 export default function DashboardPage() {
+  const [userAnalytic, setUserAnalytics] = useState(null)
+
+  useEffect(()=>{
+      const userAnalytics = async()=>{
+        const res = await getUserAnalytics()
+        if(res.status === 200){
+          if(res.data.length > 0){
+            setUserAnalytics(res.data[0])
+          }else{
+            setUserAnalytics(null)
+          }
+          
+        }
+      }
+      userAnalytics()
+  },[])
   return (
     <>
     <div className="row gy-3 mb-4 justify-content-between">
@@ -22,7 +39,7 @@ export default function DashboardPage() {
                             </div>
                           <p className="text-body-tertiary fs-9 mb-0 ms-2 mt-3">Outgoing call</p>
                         </div>
-                        <p className="text-primary mt-2 fs-6 fw-bold mb-0 mb-sm-4">3 <span className="fs-8 text-body lh-lg">Teams</span></p>
+                        <p className="text-primary mt-2 fs-6 fw-bold mb-0 mb-sm-4">{userAnalytic ?  userAnalytic.noOfUsers : 0} <span className="fs-8 text-body lh-lg">Teams</span></p>
                       </div>
                       <div className="d-flex flex-column justify-content-center flex-between-end d-sm-block text-end text-sm-start">
                         <span className="badge badge-phoenix badge-phoenix-success text-lowercase fs-10 mb-2">12 online</span>

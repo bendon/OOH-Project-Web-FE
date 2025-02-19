@@ -10,7 +10,7 @@ export default defineConfig({
         target: 'https://scout.edgetech.co.ke',
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path.replace(/^\/api/, '/api/v1'),
+        // rewrite: (path) => path.replace(/^\/api/, '/api/v1'),
       },
     },
   }
