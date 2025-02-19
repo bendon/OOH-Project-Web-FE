@@ -245,6 +245,9 @@ export async function postSwitchAccount(formData) {
 
         }
 
+        localStorage.setItem('_rtn', encryptText(data.refreshToken))
+        localStorage.setItem('_pm', encryptText(JSON.stringify(data.permissions)))
+
         const encryted = await encryptText(JSON.stringify(sessionUser));
       
         nookies.set(null, "_session", encryted, { expires, secure: true });
