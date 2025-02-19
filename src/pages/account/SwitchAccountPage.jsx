@@ -11,7 +11,6 @@ export default function SwitchAccountPage() {
     useEffect(() => {
         const setAccounts = async () => {
             const response = await getUserAccount()
-            console.log(response);
 
             setAccount(response.data)
         }

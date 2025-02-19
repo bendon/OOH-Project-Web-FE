@@ -2,12 +2,26 @@ import nookies from 'nookies'
 import CryptoJS from 'crypto-js';
 import axios from 'axios';
 
-const secretKey = "q9j3h87y23h87y23h87y23h87y23h87y"
+const secretKey = "q9j3h87y23h87y23h87y23h87y23h87"
 
 export async function encryptText(text) {
-    let encryptedText = CryptoJS.AES.encrypt(text.toString(), secretKey).toString();
-    encryptedText = encryptedText.replace('/', 'cht')
-    return encryptedText;
+    const encrypted = CryptoJS.AES.encrypt(text.toString(), secretKey).toString();
+    const urlSafeEncrypted = encodeURIComponent(encrypted); // ✅ URL-safe encoding
+    return urlSafeEncrypted;
+}
+
+export async function decryptText(text) {
+    if (!text) return null;
+    try {
+        const decodedEncrypted = decodeURIComponent(text); // ✅ Decode URL-safe text
+        const bytes = CryptoJS.AES.decrypt(decodedEncrypted, secretKey);
+        const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+        if (!decrypted) throw new Error('Decryption failed');
+        return decrypted;
+    } catch (error) {
+        console.error('Decryption error:', error.message);
+        return null;
+    }
 }
 
 function getApiUrl() {
@@ -28,17 +42,7 @@ export function convertToHumanReadable  (dateString) {
     return date.toLocaleDateString('en-US', options);
 }
 
-export async function decryptText(text) {
-    if (text === null) {
-        return;
-    }
-    if (text === undefined) {
-        return;
-    }
-    let urlEncrypted = text.replace('cht', '/')
-    const bytes = CryptoJS.AES.decrypt(urlEncrypted, secretKey);
-    return bytes.toString(CryptoJS.enc.Utf8);
-}
+
 
 export async function authLogin(formData) {
 
@@ -61,8 +65,9 @@ export async function authLogin(formData) {
             permissions: null,
 
         }
-      
-        nookies.set(null, "session", JSON.stringify(sessionUser), { expires, secure: true });
+       const encryted = await encryptText(JSON.stringify(sessionUser));
+
+        nookies.set(null, "_session",encryted, { expires, secure: true });
 
         const res = {
             status: 200,
@@ -95,12 +100,17 @@ export async function authGoogleLogin(formData) {
         })
         const expires = new Date(Date.now() + 6 * 60 * 60 * 1000)
 
-        const session = {
+        const sessionUser  = {
             token: data.accessToken,
             user: data.user,
-            expires,
+            expiry: expires,
+            account: null,
+            refreshToken: null,
+            permissions: null,
+
         }
-        nookies.set(null, "session", JSON.stringify(session), { expires, secure: true });
+        const encryted = await encryptText(JSON.stringify(sessionUser));
+        nookies.set(null, "_session", encryted, { expires, secure: true });
         const res = {
             status: 200,
             data: data,
@@ -122,16 +132,26 @@ export async function authGoogleLogin(formData) {
 }
 
 export async function authLogout() {
-    nookies.destroy(null, "session")
+    nookies.destroy(null, "_session")
 }
 
-export function getSession() {
+export async function getSession() {
+
     const cookies = nookies.get()
-    const session = cookies.session ? JSON.parse(cookies.session) : null
-    if (!session || !session.token || !session.user) {
+
+    const session = cookies._session ? cookies._session : null
+
+    const decrypted = await  decryptText(session)
+
+    if (!session) {
         return null
     }
-    return session
+    
+    const sessionUser = JSON.parse(decrypted)
+    if (!sessionUser || !sessionUser.token || !sessionUser.user) {
+        return null
+    }
+    return sessionUser
 }
 
 export async function getToken() {
@@ -221,8 +241,10 @@ export async function postSwitchAccount(formData) {
             permissions: data.permissions,
 
         }
+
+        const encryted = await encryptText(JSON.stringify(sessionUser));
       
-        nookies.set(null, "session", JSON.stringify(sessionUser), { expires, secure: true });
+        nookies.set(null, "_session", encryted, { expires, secure: true });
 
         const res = {
             status: 200,
@@ -301,7 +323,6 @@ export async function createTeamMember(payload) {
                 'Authorization': `Bearer ${await getToken()}`
             },
         })
-        console.log(data);
         
         return {
             status: 200,
