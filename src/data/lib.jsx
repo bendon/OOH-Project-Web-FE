@@ -4,6 +4,9 @@ import axios from 'axios';
 
 const secretKey = "q9j3h87y23h87y23h87y23h87y23h87"
 
+ const axiosApp = axios
+ axiosApp.defaults.withCredentials = false;
+
 export async function encryptText(text) {
     const encrypted = CryptoJS.AES.encrypt(text.toString(), secretKey).toString();
     const urlSafeEncrypted = encodeURIComponent(encrypted); // ✅ URL-safe encoding
@@ -52,7 +55,7 @@ export async function authLogin(formData) {
         const email = formData.get('email')
         const password = formData.get('password')
       
-        const {data} = await axios.post(getApiUrl()+'/login', { email, password })
+        const {data} = await axiosApp.post(getApiUrl()+'/login', { email, password })
      
       
         const expires = new Date(Date.now() + 6 * 60 * 60 * 1000)
@@ -94,7 +97,7 @@ export async function authGoogleLogin(formData) {
     try {
         const id_token = formData.get('id_token')
      
-        const { data } =  await axios.post(getApiUrl()+'/auth/google/verify', { token: id_token }, {
+        const { data } =  await axiosApp.post(getApiUrl()+'/auth/google/verify', { token: id_token }, {
             headers: { 'Content-Type': 'application/json' },
 
         })
@@ -165,7 +168,7 @@ export async function getToken() {
 export async function getUserAccount() {
     try {
 
-        const {data}  = await axios.get(getApiUrl()+'/en/accounts', {
+        const {data}  = await axiosApp.get(getApiUrl()+'/en/accounts', {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${await getToken()}`
@@ -193,7 +196,7 @@ export async function getUserAccount() {
 export async function getStaffs() {
     try {
 
-        const {data}  = await axios.get(getApiUrl()+'/en/sl/staffs', {
+        const {data}  = await axiosApp.get(getApiUrl()+'/en/sl/staffs', {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${await getToken()}`
@@ -224,7 +227,7 @@ export async function postSwitchAccount(formData) {
     try {
 
         const accountId = formData.get('accountId') 
-        const {data}  = await axios.post(getApiUrl()+'/en/switch/account', { accountId }, {
+        const {data}  = await axiosApp.post(getApiUrl()+'/en/switch/account', { accountId }, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${await getToken()}`
@@ -293,7 +296,7 @@ export async function postUserLogOut() {
 export async function getRoles() {
     try {
 
-        const {data}  = await axios.get(getApiUrl()+'/en/sl/roles', {
+        const {data}  = await axiosApp.get(getApiUrl()+'/en/sl/roles', {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${await getToken()}`
@@ -317,7 +320,7 @@ export async function getRoles() {
 export async function createTeamMember(payload) {
     try {
 
-        const {data}  = await axios.post(getApiUrl()+'/en/sl/new/staff', payload, {
+        const {data}  = await axiosApp.post(getApiUrl()+'/en/sl/new/staff', payload, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${await getToken()}`
@@ -341,7 +344,7 @@ export async function createTeamMember(payload) {
 export async function getUserAnalytics() {
     try {
 
-        const {data}  = await axios.get(getApiUrl()+'/en/sl/organization/user/analytics', {
+        const {data}  = await axiosApp.get(getApiUrl()+'/en/sl/organization/user/analytics', {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${await getToken()}`
