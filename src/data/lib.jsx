@@ -240,8 +240,8 @@ export async function postSwitchAccount(formData) {
             user: data.user,
             expiry: expires,
             account: data.account,
-            refreshToken: data.refreshToken,
-            permissions: data.permissions,
+            // refreshToken: data.refreshToken,
+            // permissions: data.permissions,
 
         }
 
