@@ -9,7 +9,6 @@ export default function ProtectedOutDoorLayout() {
         useEffect(()=>{
             const activeSession = async () => {
                 const session = await getSession()
-                console.log(session);
                 
                 setSession(session)
                 setLoading(false)
