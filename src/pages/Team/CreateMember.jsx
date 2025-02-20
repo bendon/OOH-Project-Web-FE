@@ -1,9 +1,9 @@
 import { UploadCloud, Users } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 
 import PhoneInput from 'react-phone-number-input'
-import { createTeamMember } from '../../data/lib'
+import { createTeamMember, getRoles } from '../../data/lib'
 
 export default function CreateMember() {
     const [error, setError] = useState(null)
@@ -14,10 +14,21 @@ export default function CreateMember() {
     const [email, setEmail] = useState('')
     const [gender, setGender] = useState('1')
     const [country, setCountry] = useState('KE')
-    const [roleId, setRoleId] = useState("b4c13311-4f28-49ec-a424-9541e54b5626")
+    const [roleId, setRoleId] = useState("")
+    const [roles, setRoles] = useState([])
 
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
+
+    useEffect(() => {
+        const fetchRoles = async () => {
+            const res = await getRoles()
+            if (res.status === 200) {
+                setRoles(res.data)
+            }
+        }
+        fetchRoles()
+    }, [])
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -119,7 +130,12 @@ export default function CreateMember() {
                                     <div className='col-md-6'>
                                         <div className="mb-3">
                                             <label className="form-label" htmlFor="exampleFormControlInput">Role <sup className='text-danger'>required</sup></label>
-                                            <input className="form-control" readOnly id="exampleFormControlInput" required type="text" placeholder=""     value={roleId}   onChange={(e) => setRoleId(e.target.value)} />
+                                            <select className="form-select" aria-label="Default select example" required value={roleId}   onChange={(e) => setRoleId(e.target.value)}>
+                                                <option value="">Select Role ....</option>
+                                                { roles.map((role, index) => (
+                                                    <option key={index} value={role.id}>{role.name}</option>
+                                                ))}
+                                            </select>
                                         </div>
                                     </div>
                                 </div>

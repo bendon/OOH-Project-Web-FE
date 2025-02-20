@@ -1,8 +1,19 @@
 import { ArrowLeft, ArrowRight, ChartColumnStacked, ChartNoAxesCombined, FolderKanban, Key, LayoutDashboard, Lock, MapPinHouse, MonitorCog, ReceiptText, Shield, ShieldCheck, SquarePlus, UserPlus, UserRoundCog, Users } from 'lucide-react'
 import React from 'react'
-import { Link, NavLink } from 'react-router'
+import { NavLink, useNavigate } from 'react-router'
+import { postUserLogOut } from '../data/lib'
 
 export default function SideBar() {
+    const navigate = useNavigate()
+    const logoutUser =  async () => {
+        const res = await postUserLogOut()
+     
+        if (res.status === 200) {
+            navigate('/login')
+        } else {
+            console.log(res.error)
+        }
+    }
   return (
     <nav className="navbar navbar-vertical navbar-expand-lg">
         <div className="collapse navbar-collapse" id="navbarVerticalCollapse">
@@ -144,13 +155,13 @@ export default function SideBar() {
                         </div>
                     </NavLink>
                 </div>
-                <div className="nav-item-wrapper">
-                    <NavLink className="nav-link label-1" to="/team-permission" role="button" data-bs-toggle="" aria-expanded="false">
+                <div className="nav-item-wrapper"> 
+                    <a className="nav-link label-1" href="#" onClick={logoutUser} role="button" data-bs-toggle="" aria-expanded="false">
                         <div className="d-flex align-items-center">
                             <span className="nav-link-icon"> <Lock size={18} className='icon'/> </span>
                             <span className="nav-link-text-wrapper"><span className="nav-link-text">Logout</span></span>
                         </div>
-                    </NavLink>
+                    </a>
                 </div>
               </li>
             </ul>

@@ -1,6 +1,7 @@
-import nookies from 'nookies'
+import nookies,{destroyCookie} from 'nookies'
 import CryptoJS from 'crypto-js';
 import axios from 'axios';
+import { searchableQuery } from './Utilities';
 
 const secretKey = "q9j3h87y23h87y23h87y23h87y23h87"
 
@@ -12,6 +13,8 @@ export async function encryptText(text) {
     const urlSafeEncrypted = encodeURIComponent(encrypted); // ✅ URL-safe encoding
     return urlSafeEncrypted;
 }
+
+
 
 export async function decryptText(text) {
     if (!text) return null;
@@ -193,18 +196,17 @@ export async function getUserAccount() {
     }
 }
 
-export async function getStaffs() {
+export async function getStaffs(payload) {
     try {
 
-        const {data}  = await axiosApp.get(getApiUrl()+'/en/sl/staffs', {
+        const search = searchableQuery(payload)
+
+        const {data}  = await axiosApp.get(getApiUrl()+'/en/sl/staffs'+search, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${await getToken()}`
             },
         })
-
-        
-
         const res = {
             status: 200,
             data: data,
@@ -222,6 +224,8 @@ export async function getStaffs() {
         return res
     }
 }
+
+
 
 export async function postSwitchAccount(formData) {
     try {
@@ -276,7 +280,8 @@ export async function postSwitchAccount(formData) {
 export async function postUserLogOut() {
     try {
 
-        nookies.destroy(null, "session", { path: "/" })
+        destroyCookie(null, '_session')
+        nookies.destroy(null, "_session")
         const res = {
             status: 200,
             data: null,
@@ -300,6 +305,54 @@ export async function getRoles() {
     try {
 
         const {data}  = await axiosApp.get(getApiUrl()+'/en/sl/roles', {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            },
+        })
+        return {
+            status: 200,
+            data: data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
+export async function updateRole(payload) {
+    try {
+
+        const {data}  = await axiosApp.patch(getApiUrl()+'/en/sl/role/update', payload, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            },
+        })
+        return {
+            status: 200,
+            data: data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
+export async function createRole(payload) {
+    try {
+
+        const {data}  = await axiosApp.post(getApiUrl()+'/en/sl/role', payload, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${await getToken()}`
@@ -367,5 +420,54 @@ export async function getUserAnalytics() {
         }
     }
 }
+
+export async function getUserProfile() {
+    try {
+
+        const {data}  = await axiosApp.get(getApiUrl()+'/en/profile', {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            },
+        })
+        return {
+            status: 200,
+            data: data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
+export async function updateUserPassword(payload) {
+    try {
+
+        const {data}  = await axiosApp.post(getApiUrl()+'/en/sl/change/password',payload, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            },
+        })
+        return {
+            status: 200,
+            data: data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
 
 

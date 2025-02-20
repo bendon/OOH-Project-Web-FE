@@ -3,12 +3,12 @@ import { convertToHumanReadable, getStaffs } from '../../data/lib'
 import { UserPlus2 } from 'lucide-react'
 
 export default function ManageTeam() {
-    const [staffs, setStaffs] = useState([])
+    const [staffs, setStaffs] = useState(null)
 
     useEffect(() => {
 
         const fetchData = async () => {
-            const res = await getStaffs()
+            const res = await getStaffs({})
             if (res.status === 200) {
                 setStaffs(res.data)
             }
@@ -17,6 +17,15 @@ export default function ManageTeam() {
         fetchData()
 
     }, [])
+
+    const searchTeam = async(search) => {
+        const res = await getStaffs({
+            search: search
+        })
+        if (res.status === 200) {
+            setStaffs(res.data)
+        }
+    }
     return (
         <>
             <div className='d-flex justify-content-between'>
@@ -31,9 +40,8 @@ export default function ManageTeam() {
             <div className='card'>
                 <div className='card-header'>
                     <div className='d-flex justify-content-between'>
-
                         <div>
-                            <input type="text" className="form-control" placeholder="Search" />
+                            <input type="text" className="form-control" placeholder="Search"  onChange={(e)=> searchTeam(e.target.value)} />
                         </div>
                     </div>
                 </div>
@@ -54,8 +62,8 @@ export default function ManageTeam() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {
-                                    staffs.map((staff, index) => (
+                                { staffs &&
+                                    staffs.data.map((staff, index) => (
                                         <tr key={index}>
                                             <td className='text-center' scope="row">{index + 1}</td>
                                             <td>{staff.firstName} {staff.lastName}</td>
@@ -78,6 +86,7 @@ export default function ManageTeam() {
                                 }
                             </tbody>
                         </table>
+                        <p style={{fontSize:'12px'}}>page : {staffs ? staffs.page : 0}</p>
                     </div>
                 </div>
             </div>
