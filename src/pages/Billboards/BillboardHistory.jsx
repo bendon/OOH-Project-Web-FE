@@ -3,6 +3,7 @@ import { convertToHumanReadable, decryptText, getBoardById, getFileStream } from
 import { Link, useParams } from 'react-router';
 import { ClipboardCheck, MapPin } from 'lucide-react';
 import { ShimmerContentBlock, ShimmerThumbnail } from 'react-shimmer-effects';
+import ImageCropperAI from './modal/ImageCropperAI';
 
 export default function BillboardHistory() {
   const { billboardId } = useParams();
@@ -52,12 +53,17 @@ export default function BillboardHistory() {
           <div className='col-md-12 col-sm-6 col-xxl-4'>
             <div className='card'>
               <div className='card-header'>
-                <h6 className='card-title'>Billboard Details</h6>
+                <div className='d-flex justify-content-between'>
+                  <h6 className='card-title'>Billboard Details</h6>
+                  <div>
+                    <img data-bs-toggle="modal" data-bs-target="#k_modal_image_cropper_ai" src='/project/ai-logo.png' className='cursor-pointer' width={20} />
+                  </div>
+                </div>
               </div>
               <div className='card-body'>
                 <h6>{billboard && billboard.boardCode}</h6>
-                {billboard.preview ? <img className='mb-2' src={billboard.preview} width={'100%'}  alt="Custom Marker" /> : <> <ShimmerThumbnail height={200} width={'100%'} /></>}
-                <p className="text-sm text-gray-600" style={{ lineHeight: '5px',fontSize: '12px' }}>
+                {billboard.preview ? <img className='mb-2' src={billboard.preview} width={'100%'} alt="Custom Marker" /> : <> <ShimmerThumbnail height={200} width={'100%'} /></>}
+                <p className="text-sm text-gray-600" style={{ lineHeight: '5px', fontSize: '12px' }}>
                   <strong>Occupied:</strong> <span className="badge text-bg-danger">Not Occupied</span>
                 </p>
                 <p className="text-sm text-gray-600" style={{ lineHeight: '5px', fontSize: '12px' }}>
@@ -67,7 +73,7 @@ export default function BillboardHistory() {
                   <strong>Location:</strong> {billboard.location}
                 </p>
                 <p className="text-sm text-gray-600" style={{ lineHeight: '5px', fontSize: '12px' }}>
-                  <strong>Coordinates:</strong> {billboard.latitude}, {billboard.longitude} 
+                  <strong>Coordinates:</strong> {billboard.latitude}, {billboard.longitude}
                 </p>
                 <p className="text-sm text-gray-600" style={{ lineHeight: '5px', fontSize: '12px' }}>
                   <strong>Created Date:</strong> {convertToHumanReadable(billboard.createdAt)}
@@ -76,13 +82,15 @@ export default function BillboardHistory() {
               <div className='card-footer'>
                 <h6>Description</h6>
                 <p>{billboard.description}</p>
-                </div>
+              </div>
             </div>
           </div>
           <div className='col-md-12 col-sm-6 col-xxl-4'>
             <h5> History</h5>
           </div>
         </div>}
+
+        <ImageCropperAI image={billboard ? billboard.preview : null} />
 
     </>
   )
