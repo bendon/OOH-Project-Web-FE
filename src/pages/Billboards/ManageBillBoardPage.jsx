@@ -1,8 +1,29 @@
-import { PlusSquare } from 'lucide-react'
-import React from 'react'
+import { CopyX, Edit, ListCollapse, PlusSquare } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router'
+import { getBillBoards } from '../../data/lib'
 
 export default function ManageBillBoardPage() {
+  const [billboards, setBillboards] = useState(null)
+
+  useEffect(() => {
+    const fetchBillboards = async () => {
+      const res = await getBillBoards()
+      if (res.status === 200) {
+        setBillboards(res.data)
+      }
+    }
+    fetchBillboards()
+  }, [])
+
+  const searchBillBoard = async(search) => {
+          const res = await getBillBoards({
+              search: search
+          })
+          if (res.status === 200) {
+            setBillboards(res.data)
+          }
+      }
   return (
     <>
       <div className='d-flex justify-content-between'>
@@ -42,9 +63,16 @@ export default function ManageBillBoardPage() {
       </div>
 
       <div className='card'>
+        <div className='card-header'>
+          <div className='d-flex justify-content-between'>
+            <div>
+              <input type="text" className="form-control" placeholder="Search by code" onChange={(e) => searchBillBoard(e.target.value)} />
+            </div>
+          </div>
+        </div>
         <div className='card-body'>
           <div className='table-responsive'>
-            <table className="table table-striped table-hover">
+            <table className="table  table-hover">
               <thead>
                 <tr>
                   <th>#</th>
@@ -52,12 +80,35 @@ export default function ManageBillBoardPage() {
                   <th>Coordinates</th>
                   <th>width</th>
                   <th>height</th>
+                  <th>Measurement</th>
                   <th>material</th>
-                  <th>occupied</th>
+                  <th>price</th>
+                  <th>Status</th>
                   <th>location</th>
-                  <th>Action</th>
+                  <th className='text-end'>Action</th>
                 </tr>
               </thead>
+              <tbody>
+                {billboards && billboards.data.map((billboard, index) => (
+                  <tr key={billboard.id}>
+                    <td>{index + 1}</td>
+                    <td>{billboard.boardCode}</td>
+                    <td>{billboard.latitude}, {billboard.longitude}</td>
+                    <td>{billboard.width}</td>
+                    <td>{billboard.height}</td>
+                    <td>{billboard.unit}</td>
+                    <td>{billboard.type}</td>
+                    <td>{billboard.price}</td>
+                    <td>{billboard.active ? <span className='badge text-bg-success'>active</span> : <span className='badge text-bg-danger'>inactive</span>}</td>
+                    <td>{billboard.location}</td>
+                    <td className='text-end'>
+                      <Link to={`/billboard/${billboard.id}`} className='btn btn-subtle-primary me-1 mb-1 d-inline  p-1 global-size' ><Edit className='me-3' size={12} /> Edit</Link>
+                      <Link to={`/billboard/${billboard.id}`} className='btn btn-subtle-secondary me-1 mb-1 d-inline  p-1 global-size' ><ListCollapse className='me-3' size={12} /> manage</Link>
+                      <Link to={`/billboard/${billboard.id}`} className='btn btn-subtle-danger me-1 mb-2 d-inline  p-1 global-size' ><CopyX className='me-3' size={12} /> Delete</Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
             </table>
           </div>
         </div>

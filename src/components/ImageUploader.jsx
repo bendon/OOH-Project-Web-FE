@@ -1,7 +1,10 @@
 import React, { useState } from 'react'
+import { uploadFiles } from '../data/lib';
 
 export default function ImageUploader({ onImageNameChange }) {
     const [imagePreview, setImagePreview] = useState(null);
+    const [uploadedImage, setUploadedImage] = useState(false);
+    const [uploadStatus, setUploadStatus] = useState(false);
     const [imageDetails, setImageDetails] = useState({
       name: "",
       size: "",
@@ -10,7 +13,9 @@ export default function ImageUploader({ onImageNameChange }) {
       height: 0,
     });
 
-    const handleFileChange = (e) => {
+    const handleFileChange = async (e) => {
+      setUploadedImage(false);
+      setUploadStatus(true);
         const file = e.target.files[0];
         if (file && file.type.startsWith("image/")) {
           const imageUrl = URL.createObjectURL(file);
@@ -28,10 +33,23 @@ export default function ImageUploader({ onImageNameChange }) {
         };
         img.src = imageUrl;
 
-        onImageNameChange(file.name); // Passing image name to parent
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const res = await uploadFiles(formData);
+        if (res.status === 200) {
+          onImageNameChange(res.data);
+          setUploadedImage(true);
+          setUploadStatus(false);
         } else {
+          setUploadedImage(false);
+          setUploadStatus(false);
+        }// Passing image name to parent
+        } else {
+          setUploadedImage(false);
+          setUploadStatus(false);
         setImagePreview(null);
-        onImageNameChange("");
+        onImageNameChange(null);
         }
     };
   return (
@@ -51,7 +69,8 @@ export default function ImageUploader({ onImageNameChange }) {
         onChange={handleFileChange}
         className="block w-full form-control text-sm text-gray-500 mb-4"
       />
-
+       { uploadedImage && <p className='alert alert-success p-2 border-0' style={{fontSize: '12px', borderRadius: 0}}>File uploaded success fully</p>}
+      { uploadStatus && <div className='alert alert-info p-2 d-flex align-items-center border-0' style={{fontSize: '12px', borderRadius: 0}}><div className="spinner-border text-white me-3" style={{fontSize: '10px', width: '1rem', height: '1rem'}} role="status"><span className="visually-hidden">Loading...</span></div>please wait ... uploading</div>}
       {imagePreview && (
         <div className="bg-gray-100 rounded-lg p-4">
         <h5 className="font-semibold text-lg mb-2">📄 Image Details:</h5>

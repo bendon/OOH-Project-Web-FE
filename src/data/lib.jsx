@@ -470,4 +470,102 @@ export async function updateUserPassword(payload) {
 }
 
 
+export async function uploadFiles(payload) {
+    try {
+
+        const {data}  = await axiosApp.post(getApiUrl()+'/en/sl/upload/files',payload, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${await getToken()}`
+            },
+        })
+        return {
+            status: 200,
+            data: data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
+export async function postCreateBillboard(payload) {
+    try {
+
+        const {data}  = await axiosApp.post(getApiUrl()+'/en/sl/billboard',payload, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            },
+        })
+        return {
+            status: 200,
+            data: data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
+export async function getBillBoards(payload) {
+    try {
+        const search =  searchableQuery(payload)
+
+        const {data}  = await axiosApp.get(getApiUrl()+'/en/sl/billboards'+search, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            },
+        })
+        return {
+            status: 200,
+            data: data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
+export async function getFileStream(fileName) {
+    try {
+
+        const res  = await axiosApp.get(getApiUrl()+'/en/sl/file/'+fileName, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            },
+            responseType: 'blob'
+        })
+        return {
+            status: 200,
+            data: window.URL.createObjectURL(new Blob([res.data])),
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
 

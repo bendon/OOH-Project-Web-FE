@@ -22,6 +22,7 @@ import ChangePassword from './pages/profile/ChangePassword.jsx'
 import TermPolicy from './pages/administration/TermPolicy.jsx'
 import SystemSettings from './pages/administration/SystemSettings.jsx'
 import RoleSettings from './pages/administration/RoleSettings.jsx'
+import NotFoundPage from './pages/NotFound/NotFoundPage.jsx'
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
@@ -53,14 +54,17 @@ createRoot(document.getElementById('root')).render(
         <Route path="/role-settings" element={<RoleSettings />} />
         <Route path="/system-settings" element={<SystemSettings />} />
         <Route path="/term-policy" element={<TermPolicy />} />
-        
+
         {/* profile */}
         <Route path="/user-account" element={<UserAccount />} />
         <Route path="/change-password" element={<ChangePassword />} />
+
+        {/* Catch-all for 404 */}
+      <Route path="*" element={<NotFoundPage />} />
       </Route>
 
-      
 
+      
     </Routes>
   </BrowserRouter>,
 )
