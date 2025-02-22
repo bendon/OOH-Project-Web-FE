@@ -23,6 +23,7 @@ import TermPolicy from './pages/administration/TermPolicy.jsx'
 import SystemSettings from './pages/administration/SystemSettings.jsx'
 import RoleSettings from './pages/administration/RoleSettings.jsx'
 import NotFoundPage from './pages/NotFound/NotFoundPage.jsx'
+import BillboardHistory from './pages/Billboards/BillboardHistory.jsx'
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
@@ -42,10 +43,15 @@ createRoot(document.getElementById('root')).render(
         <Route path="/" element={<DashboardPage />} />
         <Route path="/billboard-analysis" element={<BillBoardAnalysis />} />
         <Route path="/team-analysis" element={<TeamAnalysis />} />
+
+         {/* billboard routes */}
         <Route path="/manage-boards" element={<ManageBillBoardPage />} />
         <Route path="/create-board" element={<CreateBillboardPage />} />
         <Route path="/billboard-locations" element={<GeolocationMap />} />
+        <Route path="/billboard/:billboardId/history" element={<BillboardHistory />} />
         <Route path="/account" element={<AccountPage />} />
+
+         {/* team/user  routes */}
         <Route path="/team-management" element={<ManageTeam />} />
         <Route path="/create-team" element={<CreateMember />} />
         <Route path="/team-permission" element={<TeamPermission />} />

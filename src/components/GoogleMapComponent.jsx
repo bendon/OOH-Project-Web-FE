@@ -1,9 +1,9 @@
 
 import React, { useEffect, useState } from 'react'
 import { APIProvider, Map, AdvancedMarker, InfoWindow, useAdvancedMarkerRef } from '@vis.gl/react-google-maps';
-import { ClipboardCheck } from 'lucide-react';
+import { ClipboardCheck,History } from 'lucide-react';
 import { Link } from 'react-router';
-import { convertToHumanReadable, getBillBoards, getFileStream } from '../data/lib';
+import { convertToHumanReadable, encryptText, getBillBoards, getFileStream } from '../data/lib';
 import BillboardLogo from '../assets/billboard.png'
 import { ShimmerThumbnail } from "react-shimmer-effects";
 
@@ -112,10 +112,11 @@ export default function GoogleMapComponent() {
                 <p className="text-sm text-gray-600" style={{ lineHeight: '5px' }}>
                   <strong>Occupied:</strong> <span className="badge text-bg-danger">Not Occupied</span>
                 </p>
-                <div className='d-flex justify-content-between'>
+                <div className='d-flex justify-content-between mb-2'>
                   {selectedBillboard.more.active ? <span className="badge text-bg-success">Active</span> : <span className="badge text-bg-danger">Inactive</span>}
                   {convertToHumanReadable(selectedBillboard.more.createdAt)}
                 </div>
+                <Link to={`/billboard/${encryptText(selectedBillboard.more.id)}/history`} className="btn btn-subtle-info me-1 mb-1 form-control" type="button"><History className='me-2' size={15}/>show history</Link>
               </div>
             </InfoWindow>
           )}

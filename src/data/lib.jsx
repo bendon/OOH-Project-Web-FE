@@ -8,7 +8,7 @@ const secretKey = "q9j3h87y23h87y23h87y23h87y23h87"
  const axiosApp = axios
  axiosApp.defaults.withCredentials = false;
 
-export async function encryptText(text) {
+export  function encryptText(text) {
     const encrypted = CryptoJS.AES.encrypt(text.toString(), secretKey).toString();
     const urlSafeEncrypted = encodeURIComponent(encrypted); // ✅ URL-safe encoding
     return urlSafeEncrypted;
@@ -16,7 +16,7 @@ export async function encryptText(text) {
 
 
 
-export async function decryptText(text) {
+export  function decryptText(text) {
     if (!text) return null;
     try {
         const decodedEncrypted = decodeURIComponent(text); // ✅ Decode URL-safe text
@@ -71,7 +71,7 @@ export async function authLogin(formData) {
             permissions: null,
 
         }
-       const encryted = await encryptText(JSON.stringify(sessionUser));
+       const encryted =  encryptText(JSON.stringify(sessionUser));
 
         nookies.set(null, "_session",encryted, { expires, secure: true });
 
@@ -115,7 +115,7 @@ export async function authGoogleLogin(formData) {
             permissions: null,
 
         }
-        const encryted = await encryptText(JSON.stringify(sessionUser));
+        const encryted =  encryptText(JSON.stringify(sessionUser));
         nookies.set(null, "_session", encryted, { expires, secure: true });
         const res = {
             status: 200,
@@ -147,7 +147,7 @@ export async function getSession() {
 
     const session = cookies._session ? cookies._session : null
 
-    const decrypted = await  decryptText(session)
+    const decrypted =   decryptText(session)
 
     if (!session) {
         return null
@@ -252,7 +252,7 @@ export async function postSwitchAccount(formData) {
         localStorage.setItem('_rtn', encryptText(data.refreshToken))
         localStorage.setItem('_pm', encryptText(JSON.stringify(data.permissions)))
 
-        const encryted = await encryptText(JSON.stringify(sessionUser));
+        const encryted =  encryptText(JSON.stringify(sessionUser));
       
         nookies.set(null, "_session", encryted, { expires, secure: true });
 
@@ -556,6 +556,30 @@ export async function getFileStream(fileName) {
         return {
             status: 200,
             data: window.URL.createObjectURL(new Blob([res.data])),
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
+export async function getBoardById(billboardId) {
+    try {
+
+        const res  = await axiosApp.get(getApiUrl()+'/en/sl/billboard/'+billboardId, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            }
+        })
+        return {
+            status: 200,
+            data: res.data,
             error: null
         }
 
