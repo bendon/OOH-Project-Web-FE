@@ -1,8 +1,8 @@
 import { ClipboardCheck, Plus } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import ImageUploader from '../../components/ImageUploader'
-import { postCreateBillboard } from '../../data/lib';
+import { getBoardTypes, postCreateBillboard } from '../../data/lib';
 
 export default function CreateBillboardPage() {
 
@@ -22,6 +22,18 @@ export default function CreateBillboardPage() {
   const [accuracy, setAccuracy] = useState(0);
   const [parentBoardCode, setParentBoardCode] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const [boardTypes,setParentBoardTypes] = useState([])
+
+  useEffect(() => {
+    const fetchParentBoardTypes = async () => {
+      const res = await getBoardTypes()
+      if (res.status === 200) {
+        setParentBoardTypes(res.data)
+      }
+    }
+    fetchParentBoardTypes()
+  }, [])
 
   const handleImageName = (data) => {
     const uploadedId = data.id;
@@ -111,18 +123,19 @@ export default function CreateBillboardPage() {
                   </div>
                 </div>
                 <div className='row'>
+                <div className='col-md-12 col-xxl-6'>
+                    <div className="mb-3">
+                      <label className="form-label" htmlFor="exampleFormControlInput">Latitude <sup className='text-danger'>required</sup></label>
+                      <input className="form-control required" id="exampleFormControlInput" type="number" step="any" required placeholder="-1.286389" value={latitude} onChange={(e) => setLatitude(e.target.value)} />
+                    </div>
+                  </div>
                   <div className='col-md-12 col-xxl-6'>
                     <div className="mb-3">
                       <label className="form-label" htmlFor="title">Longitude <sup className='text-danger'>required</sup></label>
-                      <input className="form-control " id="title" type="text" required placeholder="-1.286389" value={longitude} onChange={(e) => setLongitude(e.target.value)} />
+                      <input className="form-control " id="title" type="text" required placeholder=" 36.817223" value={longitude} onChange={(e) => setLongitude(e.target.value)} />
                     </div>
                   </div>
-                  <div className='col-md-12 col-xxl-6'>
-                    <div className="mb-3">
-                      <label className="form-label" htmlFor="exampleFormControlInput">Latitude <sup className='text-danger'>required</sup></label>
-                      <input className="form-control required" id="exampleFormControlInput" type="number" step="any" required placeholder=" 36.817223" value={latitude} onChange={(e) => setLatitude(e.target.value)} />
-                    </div>
-                  </div>
+                  
                 </div>
                 <div className='row'>
                   <div className='col-md-12 col-xxl-6'>
@@ -156,10 +169,9 @@ export default function CreateBillboardPage() {
                       <label className="form-label" htmlFor="exampleFormControlInput">Type <sup className='text-danger'>required</sup></label>
                       <select className="form-select form-control" aria-label="Default select example" value={type} onChange={(e) => setType(e.target.value)}>
                         <option value="">Select Type</option>
-                        <option value="digital">Digital</option>
-                        <option value="static">Static</option>
-                        <option value="LED">LED</option>
-                        <option value="traditional">Traditional</option>
+                        {boardTypes.map((type, index) => (
+                          <option key={index} value={type.name}>{type.name}</option>
+                        ))}
                       </select>
                     </div>
                   </div>

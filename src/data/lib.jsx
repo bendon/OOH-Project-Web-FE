@@ -592,4 +592,220 @@ export async function getBoardById(billboardId) {
     }
 }
 
+export async function getBoardReport() {
+    try {
+
+        const res  = await axiosApp.get(getApiUrl()+'/en/sl/report/billboard/organization', {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            }
+        })
+        return {
+            status: 200,
+            data: res.data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
+export async function getBoardWeeklyReport(payload) {
+    try {
+
+        const search  = searchableQuery(payload)
+        const res  = await axiosApp.get(getApiUrl()+'/en/sl/report/billboard/weekly'+search, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            }
+        })
+        return {
+            status: 200,
+            data: res.data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
+export async function getBoardMonthlyReport(payload) {
+    try {
+
+        const search  = searchableQuery(payload)
+        const res  = await axiosApp.get(getApiUrl()+'/en/sl/report/billboard/monthly'+search, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            }
+        })
+        return {
+            status: 200,
+            data: res.data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
+export async function getBoardLocationsUploads(payload) {
+    try {
+
+        const search  = searchableQuery(payload)
+        const res  = await axiosApp.get(getApiUrl()+'/en/sl/report/billboard/locations'+search, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            }
+        })
+        return {
+            status: 200,
+            data: res.data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
+export async function getBoardTypeReport(payload) {
+    try {
+
+        const search  = searchableQuery(payload)
+        const res  = await axiosApp.get(getApiUrl()+'/en/sl/report/billboard/types'+search, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            }
+        })
+        return {
+            status: 200,
+            data: res.data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
+export async function getBoardTypes() {
+    try {
+        const res  = await axiosApp.get(getApiUrl()+'/en/sl/list/billboard/types', {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            }
+        })
+        return {
+            status: 200,
+            data: res.data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
+export async function postBoardType(payload) {
+    try {
+        const res  = await axiosApp.post(getApiUrl()+'/en/sl/create/billboard/types', payload, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            }
+        })
+        return {
+            status: 200,
+            data: res.data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
+export async function getOrganizationPermisions() {
+    try {
+        const res  = await axiosApp.get(getApiUrl()+'/en/sl/permissions', {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            }
+        })
+        return {
+            status: 200,
+            data: res.data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
+export async function getOrganizationStaffPermissions(staffId) {
+    try {
+        const res  = await axiosApp.get(getApiUrl()+'/en/sl/permission/staff/'+staffId, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            }
+        })
+        return {
+            status: 200,
+            data: res.data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
 

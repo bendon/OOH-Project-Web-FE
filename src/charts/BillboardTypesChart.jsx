@@ -1,7 +1,13 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Chart from "react-apexcharts";
 
 export default function BillboardTypesChart() {
+
+    const [billboardTypes, setBillboardTypes] = useState([])
+
+    useEffect(() => {
+        
+    })
 
     const options = {
         chart: {
