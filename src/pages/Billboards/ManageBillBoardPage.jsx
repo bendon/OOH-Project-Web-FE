@@ -2,15 +2,21 @@ import { CopyX, Edit, ListCollapse, PlusSquare } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router'
 import { getBillBoards } from '../../data/lib'
+import { ShimmerTable, ShimmerTableRow } from 'react-shimmer-effects'
 
 export default function ManageBillBoardPage() {
   const [billboards, setBillboards] = useState(null)
+  const [loadingTable, setLoadingTable] = useState(true)
 
   useEffect(() => {
     const fetchBillboards = async () => {
+      setLoadingTable(true)
       const res = await getBillBoards()
       if (res.status === 200) {
+        setLoadingTable(false)
         setBillboards(res.data)
+      }else{
+        setLoadingTable(false)
       }
     }
     fetchBillboards()
@@ -71,6 +77,7 @@ export default function ManageBillBoardPage() {
           </div>
         </div>
         <div className='card-body'>
+          {loadingTable ? <ShimmerTable    row={5} col={5} loadingAnimation="pulse" /> : <>
           <div className='table-responsive'>
             <table className="table  table-hover">
               <thead>
@@ -111,6 +118,7 @@ export default function ManageBillBoardPage() {
               </tbody>
             </table>
           </div>
+          </>}
         </div>
       </div>
     </>

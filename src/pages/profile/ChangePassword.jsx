@@ -3,9 +3,12 @@ import { convertToHumanReadable, getUserProfile, updateUserPassword } from '../.
 import { Key, MailCheck } from 'lucide-react'
 import { Link } from 'react-router'
 import { getJoinedTime } from '../../data/Utilities'
+import { ShimmerCategoryItem } from 'react-shimmer-effects'
+import EmptyResults from '../NotFound/EmptyResults'
 
 export default function ChangePassword() {
   const [profile, setProfile] = useState(null)
+  const [pageLoading, setPageLoading] = useState(false)
   const [error, setError] = useState(null)
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -15,9 +18,14 @@ export default function ChangePassword() {
   const [success, setSuccess] = useState(null)
   useEffect(() => {
     const fetchUserProfile = async () => {
+      setPageLoading(true)
       const res = await getUserProfile()
       if (res.status === 200) {
+        setPageLoading(false)
         setProfile(res.data)
+      }else{
+        setPageLoading(false)
+        setError(res.data.message)
       }
     }
     fetchUserProfile()
@@ -64,7 +72,7 @@ export default function ChangePassword() {
   },[confirmPassword])
   return (
     <>
-      <div className="row align-items-center justify-content-between g-3 mb-4">
+    <div className="row align-items-center justify-content-between g-3 mb-4">
         <div className="col-auto">
           <h3 className="mb-0">Change Password</h3>
         </div>
@@ -79,6 +87,9 @@ export default function ChangePassword() {
           </div>
         </div>
       </div>
+    {pageLoading ? <ShimmerCategoryItem  rounded={1} items={1} itemsGap={30} thumbnailHeight={400} thumbnailWidth={600} thumbnailRounded={1} contentDetailsPosition="start" contentDetailTextLines={8} /> :
+    <>
+      {profile? <>
       <div className="row g-3 mb-6">
         <div className="col-12 col-lg-8">
         {success && <p className='alert alert-success p-2 border-0' style={{ fontSize: '12px', borderRadius: 0 }}> {success}</p>}
@@ -158,7 +169,9 @@ export default function ChangePassword() {
           </div>
         </div>
       </div>
-
+      </>: <EmptyResults />}
+      </>
+}
 
     </>
   )

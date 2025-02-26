@@ -3,12 +3,16 @@ import { convertToHumanReadable, getUserAccount, getUserProfile } from '../../da
 import { getJoinedTime, userGender } from '../../data/Utilities'
 import { MailCheck, Repeat, University, UserSquare } from 'lucide-react'
 import { Link } from 'react-router'
+import { ShimmerCategoryItem, ShimmerContentBlock } from 'react-shimmer-effects'
+import EmptyResults from '../NotFound/EmptyResults'
 
 export default function UserAccount() {
   const [profile, setProfile] = useState(null)
   const [accounts, setAccounts] = useState(null)
+  const [loading, setLoading] = useState(true)
   useEffect(() => {
     const fetchUserProfile = async () => {
+      setLoading(true)
       const res = await getUserProfile()
       if (res.status === 200) {
         setProfile(res.data)
@@ -16,6 +20,7 @@ export default function UserAccount() {
 
       const res2 = await getUserAccount()
       if (res2.status === 200) {
+        setLoading(false)
         setAccounts(res2.data)
       }
     }
@@ -23,7 +28,7 @@ export default function UserAccount() {
   }, [])
   return (
     <>
-      <div className="row align-items-center justify-content-between g-3 mb-4">
+    <div className="row align-items-center justify-content-between g-3 mb-4">
         <div className="col-auto">
           <h2 className="mb-0">Profile</h2>
         </div>
@@ -38,6 +43,9 @@ export default function UserAccount() {
           </div>
         </div>
       </div>
+    { loading  ? <ShimmerCategoryItem  rounded={1} items={1} itemsGap={30} thumbnailHeight={400} thumbnailWidth={600} thumbnailRounded={1} contentDetailsPosition="start" contentDetailTextLines={8} /> :
+    <>
+    {profile? <>
       <div className="row g-3 mb-6">
         <div className="col-12 col-lg-8">
           <div className="card h-100">
@@ -144,6 +152,9 @@ export default function UserAccount() {
           <button className="btn btn-phoenix-danger form-control"><span className="fas fa-lock me-2"></span>Sign out</button>
         </div>
       </div>
+      </>: <EmptyResults />}
+      </>
+      }
     </>
   )
 }

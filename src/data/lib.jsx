@@ -328,7 +328,7 @@ export async function getRoles() {
 export async function updateRole(payload) {
     try {
 
-        const {data}  = await axiosApp.patch(getApiUrl()+'/en/sl/role/update', payload, {
+        const {data}  = await axiosApp.post(getApiUrl()+'/en/sl/role/update', payload, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${await getToken()}`
