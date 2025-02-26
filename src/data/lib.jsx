@@ -58,7 +58,7 @@ export async function authLogin(formData) {
         const email = formData.get('email')
         const password = formData.get('password')
       
-        const {data} = await axiosApp.post(getApiUrl()+'/login', { email, password })
+        const {data} = await axiosApp.post(getApiUrl()+'/auth/login', { email, password })
      
       
         const expires = new Date(Date.now() + 6 * 60 * 60 * 1000)
