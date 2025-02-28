@@ -225,6 +225,33 @@ export async function getStaffs(payload) {
     }
 }
 
+export async function getStaffById(staffId) {
+    try {
+
+        const {data}  = await axiosApp.get(getApiUrl()+'/en/sl/staff/'+staffId, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            },
+        })
+        const res = {
+            status: 200,
+            data: data,
+            error: null
+        }
+
+        return res
+
+    }catch(err){
+        const res = {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+        return res
+    }
+}
+
 
 
 export async function postSwitchAccount(formData) {
@@ -770,9 +797,21 @@ export async function getOrganizationPermisions() {
                 'Authorization': `Bearer ${await getToken()}`
             }
         })
+
+        const optimized  = res.data.reduce((acc, permission) => {
+            const { type } = permission;
+            if (!acc[type]) {
+                acc[type] = [];
+            }
+            acc[type].push(permission);
+            return acc;
+        }, {});
+
+        console.log(optimized);
+        
         return {
             status: 200,
-            data: res.data,
+            data: optimized,
             error: null
         }
 
@@ -807,5 +846,32 @@ export async function getOrganizationStaffPermissions(staffId) {
         }
     }
 }
+
+export async function getUserOrganizationUploadReport(payload) {
+    try {
+        const search = searchableQuery(payload)
+        const res  = await axiosApp.get(getApiUrl()+'/en/sl/report/billboard/user/organization'+search, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            }
+        })
+        return {
+            status: 200,
+            data: res.data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
+
+
 
 

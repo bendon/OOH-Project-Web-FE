@@ -3,12 +3,13 @@ import DashboardChart from '../../charts/DashboardChart'
 import { Presentation, User } from 'lucide-react'
 import GoogleMap from '../../components/GoogleMapComponent'
 import GoogleMapComponent from '../../components/GoogleMapComponent'
-import { getBoardLocationsUploads, getBoardReport, getUserAnalytics } from '../../data/lib'
+import { getBoardLocationsUploads, getBoardReport, getUserAnalytics, getUserOrganizationUploadReport } from '../../data/lib'
 
 export default function DashboardPage() {
   const [userAnalytic, setUserAnalytics] = useState(null)
   const [billboardReport, setBillboardReport] = useState(null)
   const [locationReport, setLocationReport] = useState(null)
+  const  [userUploadReport, setUserUploadReport] = useState(null)
 
   useEffect(() => {
 
@@ -18,7 +19,18 @@ export default function DashboardPage() {
         setBillboardReport(res.data)
       }
     }
+
+    const fetchUserOrganizationUploadReport = async () => {
+      const res = await getUserOrganizationUploadReport({
+        page: 1,
+        size: 5,
+      })
+      if (res.status === 200) {
+        setUserUploadReport(res.data)
+      }
+    }
     fetchBillBoardReport()
+    fetchUserOrganizationUploadReport()
   }, [])
 
   useEffect(() => {
@@ -26,7 +38,6 @@ export default function DashboardPage() {
     const fetchBillBoardLocationReport = async () => {
       const res = await getBoardLocationsUploads({})
       if (res.status === 200) {
-        console.log(res.data);
         
         setLocationReport(res.data)
       }
@@ -100,21 +111,11 @@ export default function DashboardPage() {
               <div className="border-bottom border-translucent">
                 <h5 className="pb-4 border-bottom border-translucent">Top 5 User Uploads</h5>
                 <ul className="list-group list-group-flush">
-                  <li className="list-group-item bg-transparent list-group-crm fw-bold text-body fs-9 py-2">
-                    <div className="d-flex justify-content-between"><span className="fw-normal fs-9 mx-1"> <span className="fw-bold">1. </span>James Otieno </span><span>(65)</span></div>
-                  </li>
-                  <li className="list-group-item bg-transparent list-group-crm fw-bold text-body fs-9 py-2">
-                    <div className="d-flex justify-content-between"><span className="fw-normal mx-1"><span className="fw-bold">2. </span>Mary Achieng</span><span>(74)</span></div>
-                  </li>
-                  <li className="list-group-item bg-transparent list-group-crm fw-bold text-body fs-9 py-2">
-                    <div className="d-flex justify-content-between"><span className="fw-normal fs-9 mx-1"><span className="fw-bold">3.</span> Joseph Kibet</span><span>(32)</span></div>
-                  </li>
-                  <li className="list-group-item bg-transparent list-group-crm fw-bold text-body fs-9 py-2">
-                    <div className="d-flex justify-content-between"><span className="fw-normal fs-9 mx-1"><span className="fw-bold">4.</span> Martin Luta</span><span>(25)</span></div>
-                  </li>
-                  <li className="list-group-item bg-transparent list-group-crm fw-bold text-body fs-9 py-2">
-                    <div className="d-flex justify-content-between"><span className="fw-normal fs-9 mx-1"> <span className="fw-bold">5.</span> Joel Mkambu</span><span>(23)</span></div>
-                  </li>
+                  {userUploadReport && userUploadReport.data.map((item, index) => (
+                    <li key={index} className="list-group-item bg-transparent list-group-crm fw-bold text-body fs-9 py-2">
+                      <div className="d-flex justify-content-between"><span className="fw-normal fs-9 mx-1"> <span className="fw-bold">{index + 1}. </span>{item.userName} </span><span>({item.billboardCount})</span></div>
+                    </li>
+                  ))}
                 </ul>
               </div>
             </div>

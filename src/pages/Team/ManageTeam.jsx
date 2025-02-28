@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { convertToHumanReadable, getStaffs } from '../../data/lib'
-import { UserPlus2 } from 'lucide-react'
+import { convertToHumanReadable, encryptText, getStaffs } from '../../data/lib'
+import { FileKey, UserPlus2 } from 'lucide-react'
+import { Link } from 'react-router'
 
 export default function ManageTeam() {
     const [staffs, setStaffs] = useState(null)
@@ -34,9 +35,7 @@ export default function ManageTeam() {
                     <button className='btn btn-primary' style={{fontSize:'12px'}}><UserPlus2 size={15} /> Add New</button>
                 </div>
             </div>
-
             <hr />
-
             <div className='card'>
                 <div className='card-header'>
                     <div className='d-flex justify-content-between'>
@@ -59,6 +58,7 @@ export default function ManageTeam() {
                                     <th scope="col">Role</th>
                                     <th scope="col">Status</th>
                                     <th scope="col">Date</th>
+                                    <th scope="col">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -81,6 +81,9 @@ export default function ManageTeam() {
                                                 {!staff.active && <span className='badge bg-danger'>Inactive</span>}
                                             </td>
                                             <td>{convertToHumanReadable(staff.createdAt)}</td>
+                                            <td>
+                                                <Link to={`/manage-team/${encryptText(staff.userId)}/permissions`} className='btn btn-primary btn-sm p-1'><FileKey size={15} className='me-2'/> permissions</Link>
+                                            </td>
                                         </tr>
                                     ))
                                 }

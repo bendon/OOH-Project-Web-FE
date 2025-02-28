@@ -24,6 +24,7 @@ import SystemSettings from './pages/administration/SystemSettings.jsx'
 import RoleSettings from './pages/administration/RoleSettings.jsx'
 import NotFoundPage from './pages/NotFound/NotFoundPage.jsx'
 import BillboardHistory from './pages/Billboards/BillboardHistory.jsx'
+import TeamPermissionDetails from './pages/Team/TeamPermissionDetails.jsx'
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
@@ -54,7 +55,7 @@ createRoot(document.getElementById('root')).render(
          {/* team/user  routes */}
         <Route path="/team-management" element={<ManageTeam />} />
         <Route path="/create-team" element={<CreateMember />} />
-        <Route path="/team-permission" element={<TeamPermission />} />
+        <Route path="/manage-team/:staffId/permissions" element={<TeamPermissionDetails />} />
 
         {/* administrator routes */}
         <Route path="/role-settings" element={<RoleSettings />} />

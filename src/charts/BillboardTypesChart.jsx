@@ -38,11 +38,7 @@ export default function BillboardTypesChart() {
         },
     };
 
-    const series = [
-        {
-            data: [400, 430, 448, 470, 540, 580, 690]
-          }
-    ];
+    const series = [{ data: [400, 430, 448, 470, 540, 580, 690] }];
     return (
         <div className='card card-body  mb-3'>
             <Chart options={options} series={series} type="bar" height={270}  />
