@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Chart from "react-apexcharts";
-import { getBoardMonthlyReport } from '../data/lib';
+import { getBoardMonthlyReport, getOrganizationUploadsYearlyReport } from '../data/lib';
 
 export default function BillboardUploadHourChart() {
 
@@ -47,9 +47,8 @@ export default function BillboardUploadHourChart() {
 
   useEffect(() => {
     const fetchMonthlyReport = async () => {
-      const res = await getBoardMonthlyReport({
+      const res = await getOrganizationUploadsYearlyReport({
         year: +yearReport,
-        month: null,
       })
 
 
@@ -63,6 +62,7 @@ export default function BillboardUploadHourChart() {
 
 
   useEffect(() => {
+console.log(monthReport);
 
     const data = monthReport.map(item => {
       return {

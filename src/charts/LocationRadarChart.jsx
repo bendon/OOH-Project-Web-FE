@@ -58,7 +58,7 @@ export default function LocationRadarChart() {
 
             // set options categories
             const labels = data.map((report) => report.location)
-            console.log(labels);
+           
 
             setOptions((prevOptions) => ({
                 ...prevOptions,
