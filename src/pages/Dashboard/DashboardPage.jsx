@@ -3,14 +3,15 @@ import DashboardChart from '../../charts/DashboardChart'
 import { Presentation, User } from 'lucide-react'
 import GoogleMap from '../../components/GoogleMapComponent'
 import GoogleMapComponent from '../../components/GoogleMapComponent'
-import { getBoardLocationsUploads, getBoardReport, getUserAnalytics, getUserOrganizationUploadReport } from '../../data/lib'
+import { getBoardLocationsUploads, getBoardReport, getUser, getUserAnalytics, getUserOrganizationUploadReport } from '../../data/lib'
 import LocationRadarChart from '../../charts/LocationRadarChart'
 
 export default function DashboardPage() {
   const [userAnalytic, setUserAnalytics] = useState(null)
   const [billboardReport, setBillboardReport] = useState(null)
   const [locationReport, setLocationReport] = useState(null)
-  const  [userUploadReport, setUserUploadReport] = useState(null)
+  const [userUploadReport, setUserUploadReport] = useState(null)
+  const [user, setUser] = useState(null)
 
   useEffect(() => {
 
@@ -30,6 +31,14 @@ export default function DashboardPage() {
         setUserUploadReport(res.data)
       }
     }
+
+    const fetchUser = async () => {
+      const res = await getUser()
+      if (res) {
+        setUser(res)
+      }
+    }
+    fetchUser()
     fetchBillBoardReport()
     fetchUserOrganizationUploadReport()
   }, [])
@@ -39,7 +48,7 @@ export default function DashboardPage() {
     const fetchBillBoardLocationReport = async () => {
       const res = await getBoardLocationsUploads({})
       if (res.status === 200) {
-        
+
         setLocationReport(res.data)
       }
     }
@@ -64,6 +73,9 @@ export default function DashboardPage() {
     <>
       <div className="row gy-3 mb-4 justify-content-between">
         <div className="col-xxl-6">
+        <div className='alert ps-0 rounded-0 pt-0 mb-3 border-bottom' >
+            <h6 style={{ fontWeight: '800px', fontSize: '18px' }}>Welcome back {user && user.firstName  + ' '+ user.lastName}</h6>
+          </div>
           <h5 className="mb-2 text-body-emphasis">Overview</h5>
           <div className="row g-3 mb-3">
             <div className="col-sm-6 col-md-4 col-xl-3 col-xxl-4">
@@ -108,6 +120,7 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
+
             <div className="col-md-4 col-xl-6 col-xxl-4 gy-5 gy-md-3">
               <div className="border-bottom border-translucent">
                 <h5 className="pb-4 border-bottom border-translucent">Top 5 User Uploads</h5>
@@ -121,6 +134,7 @@ export default function DashboardPage() {
               </div>
             </div>
           </div>
+          
         </div>
         <div className="col-xxl-6 mb-6">
           <div style={{ width: '100%' }} >
@@ -138,27 +152,27 @@ export default function DashboardPage() {
                 <th>Total Uploads</th>
               </tr>
             </thead>
-            {locationReport !== null ? 
-            <>
-            {locationReport.data.map((location, index) => (
-              <tbody key={index}>
-                <tr>
-                  <td>{location.location}</td>
-                  <td>{location.countPerLocation}</td>
-                </tr>
-              </tbody>
-            ))}
-            </> : 
+            {locationReport !== null ?
+              <>
+                {locationReport.data.map((location, index) => (
+                  <tbody key={index}>
+                    <tr>
+                      <td>{location.location}</td>
+                      <td>{location.countPerLocation}</td>
+                    </tr>
+                  </tbody>
+                ))}
+              </> :
 
-            <>
-            <tbody>
-              <tr>
-                <td><p>No data found</p></td>
-              </tr>
-            </tbody>
-            </>
-          
-          }
+              <>
+                <tbody>
+                  <tr>
+                    <td><p>No data found</p></td>
+                  </tr>
+                </tbody>
+              </>
+
+            }
           </table>
         </div>
         <div className='col-xxl-7'>

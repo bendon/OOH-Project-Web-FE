@@ -168,6 +168,14 @@ export async function getToken() {
     return session.token
 }
 
+export async function getUser() {
+    const session = await getSession()
+    if (!session) {
+        return null
+    }
+    return session.user
+}
+
 export async function getUserAccount() {
     try {
 
