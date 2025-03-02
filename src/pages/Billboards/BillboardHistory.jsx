@@ -89,7 +89,7 @@ export default function BillboardHistory() {
             <h5> History</h5>
           </div>
         </div>}
-
+       
         <ImageCropperAI image={billboard ? billboard.preview : null} />
 
     </>

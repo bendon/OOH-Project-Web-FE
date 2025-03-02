@@ -1,10 +1,12 @@
 import { X } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
-import { ShimmerThumbnail } from 'react-shimmer-effects'
+import { ShimmerCategoryItem, ShimmerContentBlock, ShimmerPostDetails, ShimmerSocialPost, ShimmerThumbnail } from 'react-shimmer-effects'
 import Tesseract from 'tesseract.js';
 import ReactCrop from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css'
 import DOMPurify from 'dompurify';
+import { postImageDataExtraction } from '../../../data/lib';
+import { set } from 'date-fns';
 
 export default function ImageCropperAI({ image }) {
     const [crop, setCrop] = useState()
@@ -17,6 +19,9 @@ export default function ImageCropperAI({ image }) {
     const [confidence, setConfidence] = useState(0);
     const [progress, setProgress] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [formdata, setFormData] = useState(null)
+    const [fileAnalysis, setFileAnalysis] = useState(null)
+    const [loadingAnalysis, setLoadingAnalysis] = useState(false)
 
     useEffect(() => {
         if (!completedCrop || !previewCanvasRef.current) {
@@ -53,64 +58,90 @@ export default function ImageCropperAI({ image }) {
         canvas.toBlob((blob) => {
             if (blob) {
                 setPreviewUrl(URL.createObjectURL(blob));
+                const formData = new FormData();
+                formData.append("file", blob, "cropped-image.png"); // "file" is the key name
+                setFormData(formData);
+
             }
         }, 'image/png');
     }, [completedCrop])
 
     useEffect(() => {
         if (previewUrl) {
-            extractText(previewUrl);
-          }
-        
+            // extractText(previewUrl);
+
+        }
+
+        const fetchImageData = async () => {
+            if (previewUrl) {
+                setLoadingAnalysis(true);
+                setFileAnalysis(null)
+                try {
+                    const response = await postImageDataExtraction(formdata);
+                    if (response.status === 200) {
+                        console.log(response.data);
+                        setFileAnalysis(response.data);
+                        setLoadingAnalysis(false);
+                    }
+                } catch (error) {
+                    setLoadingAnalysis(false);
+                    console.error('Error extracting text:', error);
+                }
+            }
+        };
+        fetchImageData();
+
     }, [previewUrl])
 
-    
-  const extractText = (imageUrl) => {
-    setLoading(true);
-    setProgress(0);
-    setText('');
 
-    Tesseract.recognize(imageUrl, 'eng', {
-      logger: (m) => {
-        if (m.status === 'recognizing text') {
-          setProgress(Math.floor(m.progress * 100));
-        }
-      },
-    })
-      .then((results) => {
-        // console.log(results);
-        const sanitizedHtml = DOMPurify.sanitize(results.data.text);
-        setText(sanitizedHtml); 
-        setConfidence(results.data.confidence);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error('OCR Error:', err);
-        setLoading(false);
-      });
-  };
+    const extractText = (imageUrl) => {
+        setLoading(true);
+        setProgress(0);
+        setText('');
+
+        Tesseract.recognize(imageUrl, 'eng', {
+            logger: (m) => {
+                if (m.status === 'recognizing text') {
+                    setProgress(Math.floor(m.progress * 100));
+                }
+            },
+        })
+            .then((results) => {
+                // console.log(results);
+                const sanitizedHtml = DOMPurify.sanitize(results.data.text);
+                setText(sanitizedHtml);
+                setConfidence(results.data.confidence);
+                setLoading(false);
+            })
+            .catch((err) => {
+                console.error('OCR Error:', err);
+                setLoading(false);
+            });
+    };
 
     return (
         <>
             <div className="modal fade" id="k_modal_image_cropper_ai" tabIndex="-1" data-bs-backdrop="static" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                <div className="modal-dialog modal-dialog-centered modal-lg">
+                <div className="modal-dialog modal-dialog-centered modal-lg" style={{minWidth: '80vw'}}>
                     <div className="modal-content">
                         <div className="modal-header justify-content-between ">
                             <h5 className="modal-title  dark__text-gray-1100" id="staticBackdropLabel">Content Extraction</h5>
                             <button className="btn p-1" type="button" data-bs-dismiss="modal" aria-label="Close"><X size={15} /> </button>
                         </div>
                         <div className="modal-body">
-                            <ReactCrop crop={crop} onChange={c => setCrop(c)} onComplete={(c) => setCompletedCrop(c)}>
-                                {image ? <img ref={imgRef} className='mb-2' src={image} width={'100%'} alt="Custom Marker" /> : <> <ShimmerThumbnail height={200} width={'100%'} /></>}
-                            </ReactCrop>
-
-                            <div className='mb-3'>
+                            <div className='row '>
+                                <div className='col-xxl-6'>
+                                    <ReactCrop crop={crop} onChange={c => setCrop(c)} onComplete={(c) => setCompletedCrop(c)}>
+                                        {image ? <img ref={imgRef} className='mb-2' src={image} width={'100%'} alt="Custom Marker" /> : <> <ShimmerThumbnail height={200} width={'100%'} /></>}
+                                    </ReactCrop>
+                                </div>
+                                <div className='col-xxl-6'>
                                 {completedCrop && (
                                     <>
-                                        <h6 className="mt-3">Preview:</h6>
-                                        <canvas
+                                        <canvas 
                                             ref={previewCanvasRef}
                                             style={{
+                                                display: 'none',
                                                 width: completedCrop.width,
                                                 height: completedCrop.height,
                                                 border: '1px solid #ddd',
@@ -118,17 +149,33 @@ export default function ImageCropperAI({ image }) {
                                         />
                                     </>
                                 )}
+                                {loadingAnalysis && <ShimmerCategoryItem  title /> }
+                                {fileAnalysis && <>
+                                <h6>Campaign Brand</h6>
+                                <p>{fileAnalysis.campaign_brand}</p>
+                                <h6>Description </h6>
+                                <p>{fileAnalysis.campaign_description}</p>
+                                {fileAnalysis.location ? <p>Location : {fileAnalysis.location}</p> : ''}
+                                <h6>Contacts</h6>
+                                <p>Phone : {fileAnalysis.contact_information.phone.map((item, index)=> <span key={index}>{item}</span>)}</p>
+                                <p>Email : {fileAnalysis.contact_information.email.map((item, index)=> <span key={index}>{item}</span>)}</p>
+                                <h6>Target Audience</h6>
+                                <p>{fileAnalysis.target_audience}</p>
+                                <h6>Additional Insights</h6>
+                                <p> {fileAnalysis.additional_notes}</p>
+                                <h6>Target Gender</h6>
+                                <p> {fileAnalysis.target_gender}</p>
+                                <h6>Target Age</h6>
+                                <p> {fileAnalysis.target_age}</p>
+                                <h6>Billboard Measurements</h6>
+                                <p>Height : {fileAnalysis.billboard_measurements.height} {fileAnalysis.billboard_measurements.units}</p>
+                                <p>Width : {fileAnalysis.billboard_measurements.width} {fileAnalysis.billboard_measurements.units}</p>
+                                <h6>Confidence Percentage</h6>
+                                <p> {fileAnalysis.percentage_accuracy}</p>
+                                </>}
+                                </div>
                             </div>
-                            <div>
-                            {loading && <p className="text-blue-500">Extracting text... {progress}%</p>}
-                            <p dangerouslySetInnerHTML={{ __html: text }} />
-                            <p>Confidence: <span className='badge text-bg-secondary'>{confidence}</span></p>
-                                {/* <textarea
-                                    readOnly
-                                    value={text}
-                                    className="w-full p-2 border rounded-md h-40"
-                                /> */}
-                            </div>
+
                         </div>
                         <div className="modal-footer">
                             <button className="btn btn-outline-danger" type="button" data-bs-dismiss="modal"><X size={15} /> Cancel</button>

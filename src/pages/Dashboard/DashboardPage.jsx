@@ -4,6 +4,7 @@ import { Presentation, User } from 'lucide-react'
 import GoogleMap from '../../components/GoogleMapComponent'
 import GoogleMapComponent from '../../components/GoogleMapComponent'
 import { getBoardLocationsUploads, getBoardReport, getUserAnalytics, getUserOrganizationUploadReport } from '../../data/lib'
+import LocationRadarChart from '../../charts/LocationRadarChart'
 
 export default function DashboardPage() {
   const [userAnalytic, setUserAnalytics] = useState(null)
@@ -129,6 +130,7 @@ export default function DashboardPage() {
       </div>
       <div className='row'>
         <div className='col-xxl-5 card card-body'>
+          <LocationRadarChart />
           <table className="table table-hover table-sm table-responsive">
             <thead>
               <tr>
@@ -149,7 +151,11 @@ export default function DashboardPage() {
             </> : 
 
             <>
-            <p>No data found</p>
+            <tbody>
+              <tr>
+                <td><p>No data found</p></td>
+              </tr>
+            </tbody>
             </>
           
           }

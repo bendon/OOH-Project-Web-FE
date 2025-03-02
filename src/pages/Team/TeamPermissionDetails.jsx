@@ -117,14 +117,4 @@ export default function TeamPermissionDetails() {
     )
 }
 
-{/* <div className="col-lg-3 mb-3" key={index}>
-<div className="card">
-    
-    <div className="card-body">
-        <div className="form-check mb-2" >
-            <input className="form-check-input input-light-success" type="checkbox" />
-            <label className="form-check-label cursor-pointer">{item.name}</label>
-        </div>
-    </div>
-</div>
-</div> */}
+

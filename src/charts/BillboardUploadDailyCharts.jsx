@@ -1,8 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Chart from "react-apexcharts";
 import { getBoardWeeklyReport } from '../data/lib';
+import flatpickr from 'flatpickr';
+import "flatpickr/dist/flatpickr.min.css";
+import { getISOWeek, getYear, getMonth } from "date-fns";
 
 export default function BillboardUploadDailyChart() {
+  const today = new Date();
+// setDateFilter([getYear(today),getMonth(today) + 1,getISOWeek(today)])
+  const [dateFilter, setDateFilter] = useState([getYear(today),getMonth(today) + 1,getISOWeek(today)]);
+
+
+  const [chartKey, setChartKey] = useState(0);
   const [weeklyReport, setWeeklyReport] = useState([])
   const [series,setSeries] = useState([{
     name: "Totals",
@@ -20,9 +29,9 @@ export default function BillboardUploadDailyChart() {
         enabled: false,
       },
     },
-    title: {
-      text: "Billboard Uploads by Day of Week"
-    },
+    // title: {
+    //   text: "Billboard Uploads by Day of Week"
+    // },
     dataLabels: {
       enabled: false
     },
@@ -43,21 +52,45 @@ export default function BillboardUploadDailyChart() {
     }
 
   };
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+
+  
+    
+
+    if (inputRef.current) {
+      flatpickr(inputRef.current, {
+        enableTime: false,
+        dateFormat: "Y-W", // Format: YYYY-WW (Year-Week)
+        weekNumbers: true,  // Show week numbers
+        altInput: true,
+        altFormat: "Y M \\Week W", // Display as "YYYY Week WW"
+        defaultDate: new Date(),
+        onChange: (selectedDates) => {
+          if (selectedDates.length > 0) {
+            const selectedDate = selectedDates[0];
+            setDateFilter([getYear(selectedDate),getMonth(selectedDate) + 1,getISOWeek(selectedDate)])
+           
+          }
+        }
+      });
+    }
+  }, []);
 
   useEffect(() =>{
       const fetchWeeklyReport  = async  () => {
         const res =  await getBoardWeeklyReport({
-          year: null,
-          month: null,
-          week: null
+          year: dateFilter[0],
+          month: dateFilter[1],
+          week: dateFilter[2]
         })
-
         if(res.status === 200){
           setWeeklyReport(res.data)
         }
       }
       fetchWeeklyReport()
-  },[])
+  },[dateFilter])
 
   useEffect(()=>{
 
@@ -68,6 +101,16 @@ export default function BillboardUploadDailyChart() {
         day : item.dayName
       }
     })
+
+    if(data.length < 1){
+      setSeries([{
+        name: "Totals",
+        type: 'column',
+        data: [0, 0, 0, 0, 0, 0, 0]
+      }])
+      setChartKey((prevKey) => prevKey + 1);
+      return
+    }
 
     data.forEach(item => {
       if(item.day === 'Sunday'){
@@ -93,14 +136,20 @@ export default function BillboardUploadDailyChart() {
       }
     })
     
-
+    setChartKey((prevKey) => prevKey + 1);
   },[weeklyReport])
 
   
   return (
     <>
       <div className='card card-body mb-3'>
-        <Chart options={options} series={series} type="line" height={270} />
+        <div className='d-flex justify-content-between  align-items-center'>
+          <h6>Billboard Uploads by Year & Week</h6>
+          <div>
+            <input type="text" className='week-picker' placeholder='Enter Year' ref={inputRef} style={{ display: "none" }}/>
+          </div>
+        </div>
+        <Chart key={chartKey} options={options} series={series} type="line" height={270} />
       </div>
     </>
   )

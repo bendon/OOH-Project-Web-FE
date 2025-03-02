@@ -806,8 +806,6 @@ export async function getOrganizationPermisions() {
             acc[type].push(permission);
             return acc;
         }, {});
-
-        console.log(optimized);
         
         return {
             status: 200,
@@ -870,6 +868,54 @@ export async function getUserOrganizationUploadReport(payload) {
         }
     }
 }
+
+export async function getOrganizationUploadsYearlyReport(payload) {
+    try {
+        const search = searchableQuery(payload)
+        const res  = await axiosApp.get(getApiUrl()+'/en/sl/report/billboard/yearly'+search, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            }
+        })
+        return {
+            status: 200,
+            data: res.data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
+export async function postImageDataExtraction(payload) {
+    try {
+        const res  = await axiosApp.post(getApiUrl()+'/auth/gemini/data/extraction',payload, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                // 'Authorization': `Bearer ${await getToken()}`
+            }
+        })
+        return {
+            status: 200,
+            data: res.data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
 
 
 
