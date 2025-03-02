@@ -1,11 +1,29 @@
 
 import React, { useEffect, useState } from 'react'
-import { APIProvider, Map, AdvancedMarker, InfoWindow, useAdvancedMarkerRef } from '@vis.gl/react-google-maps';
+import { APIProvider, Map, AdvancedMarker, InfoWindow, useMap } from '@vis.gl/react-google-maps';
 import { ClipboardCheck,History } from 'lucide-react';
 import { Link } from 'react-router';
 import { convertToHumanReadable, encryptText, getBillBoards, getFileStream } from '../data/lib';
 import BillboardLogo from '../assets/billboard.png'
 import { ShimmerThumbnail } from "react-shimmer-effects";
+
+const TrafficLayer = () => {
+    const map = useMap(); // Get the map instance
+
+    useEffect(() => {
+        if (!map) return;
+
+        const trafficLayer = new window.google.maps.TrafficLayer();
+        trafficLayer.setMap(map);
+
+        return () => {
+            trafficLayer.setMap(null); // Clean up the layer when component unmounts
+        };
+    }, [map]);
+
+    return null; // This component doesn't render anything
+};
+
 
 export default function GoogleMapComponent() {
   const [billboards, setBillboards] = useState(null)
@@ -81,6 +99,8 @@ export default function GoogleMapComponent() {
           className="map-container"
           style={{ height: "400px" }}
         >,
+        
+        <TrafficLayer /> 
 
           {locations.map((loc) => (
             <AdvancedMarker
