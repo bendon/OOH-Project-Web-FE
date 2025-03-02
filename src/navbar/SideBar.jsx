@@ -97,14 +97,6 @@ export default function SideBar() {
                         </div>
                     </NavLink>
                 </div>
-                <div className="nav-item-wrapper">
-                    <NavLink className="nav-link label-1" to="/team-permission" role="button" data-bs-toggle="" aria-expanded="false">
-                        <div className="d-flex align-items-center">
-                            <span className="nav-link-icon"> <Shield size={18} className='icon'/> </span>
-                            <span className="nav-link-text-wrapper"><span className="nav-link-text">Member Permissions</span></span>
-                        </div>
-                    </NavLink>
-                </div>
               </li>
               <li className="nav-item">
                 <p className="navbar-vertical-label">Administration</p>
@@ -115,14 +107,6 @@ export default function SideBar() {
                         <div className="d-flex align-items-center">
                             <span className="nav-link-icon"> <ShieldCheck size={18} className='icon'/> </span>
                             <span className="nav-link-text-wrapper"><span className="nav-link-text">Role settings</span></span>
-                        </div>
-                    </NavLink>
-                </div>
-                <div className="nav-item-wrapper">
-                    <NavLink className="nav-link label-1" to="/system-settings" role="button" data-bs-toggle="" aria-expanded="false">
-                        <div className="d-flex align-items-center">
-                            <span className="nav-link-icon"> <MonitorCog size={18} className='icon'/> </span>
-                            <span className="nav-link-text-wrapper"><span className="nav-link-text">System Settings</span></span>
                         </div>
                     </NavLink>
                 </div>

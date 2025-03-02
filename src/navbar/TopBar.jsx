@@ -1,7 +1,7 @@
 import { Bell, Moon, Sun } from 'lucide-react'
 import React from 'react'
 import { postUserLogOut } from '../data/lib'
-import { useNavigate } from 'react-router'
+import { NavLink, useNavigate } from 'react-router'
 
 export default function TopBar() {
         const navigate = useNavigate()
@@ -77,12 +77,9 @@ export default function TopBar() {
                   </div>
                   <div className="overflow-auto scrollbar" style={{ height: "10rem" }}>
                     <ul className="nav d-flex flex-column mb-2 pb-1">
-                      <li className="nav-item"><a className="nav-link px-3 d-block" href="#!"> <span className="me-2 text-body align-bottom" data-feather="user"></span><span>Profile</span></a></li>
-                      <li className="nav-item"><a className="nav-link px-3 d-block" href="#!"><span className="me-2 text-body align-bottom" data-feather="pie-chart"></span>Dashboard</a></li>
-                      <li className="nav-item"><a className="nav-link px-3 d-block" href="#!"> <span className="me-2 text-body align-bottom" data-feather="lock"></span>Posts &amp; Activity</a></li>
-                      <li className="nav-item"><a className="nav-link px-3 d-block" href="#!"> <span className="me-2 text-body align-bottom" data-feather="settings"></span>Settings &amp; Privacy </a></li>
-                      <li className="nav-item"><a className="nav-link px-3 d-block" href="#!"> <span className="me-2 text-body align-bottom" data-feather="help-circle"></span>Help Center</a></li>
-                      <li className="nav-item"><a className="nav-link px-3 d-block" href="#!"> <span className="me-2 text-body align-bottom" data-feather="globe"></span>Language</a></li>
+                      <li className="nav-item"><NavLink className="nav-link px-3 d-block" to={'/user-account'}> <span className="me-2 text-body align-bottom" data-feather="user"></span><span>Profile</span></NavLink></li>
+                      <li className="nav-item"><NavLink className="nav-link px-3 d-block" to={'/'}><span className="me-2 text-body align-bottom" data-feather="pie-chart"></span>Dashboard</NavLink></li>
+                      <li className="nav-item"><NavLink className="nav-link px-3 d-block" to={'/change-password'}> <span className="me-2 text-body align-bottom" data-feather="settings"></span>Change Password </NavLink></li>
                     </ul>
                   </div>
                   <div className="card-footer p-0 border-top border-translucent">
