@@ -1,16 +1,26 @@
 import { Bell, Moon, Sun } from 'lucide-react'
-import React from 'react'
-import { postUserLogOut } from '../data/lib'
+import React, { useEffect, useState } from 'react'
+import { getUser, postUserLogOut } from '../data/lib'
 import { NavLink, useNavigate } from 'react-router'
 
 export default function TopBar() {
         const navigate = useNavigate()
+        const [user, setUser] = useState(null)
     const logout = async () => {
        const data =  await postUserLogOut()
        if (data.status === 200) {
            navigate("/login")
         }
     }
+    useEffect(()=>{
+      const fetchUser = async () => {
+            const res = await getUser()
+            if (res) {
+              setUser(res)
+            }
+          }
+          fetchUser()
+    },[])
   return (
     <nav className="navbar navbar-top fixed-top navbar-expand" style={{backgroundColor: '#2B4B9B'}} id="navbarDefault">
         <div className="collapse navbar-collapse justify-content-between">
@@ -71,7 +81,8 @@ export default function TopBar() {
                         <img className="rounded-circle " src="/project/11.png" alt="" />
 
                       </div>
-                      <h6 className="mt-2 text-body-emphasis">Jerry Seinfield</h6>
+                      <h6 className="mt-2 text-body-emphasis">{user && user.firstName  + ' '+ user.lastName}</h6>
+                      <p>{user && user.email}</p>
                     </div>
                   
                   </div>
