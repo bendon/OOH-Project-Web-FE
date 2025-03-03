@@ -29,7 +29,9 @@ export default function ManageBillBoardPage() {
   useEffect(() => {
     const fetchBillboards = async () => {
       setLoadingTable(true)
-      const res = await getBillBoards()
+      const res = await getBillBoards({
+        size: 10
+      })
       if (res.status === 200) {
         setLoadingTable(false)
         setBillboards(res.data)
@@ -48,6 +50,7 @@ export default function ManageBillBoardPage() {
 
   const searchBillBoard = async (search) => {
     const res = await getBillBoards({
+      size: 10,
       search: search
     })
     if (res.status === 200) {
@@ -58,7 +61,9 @@ export default function ManageBillBoardPage() {
     setBillboards(null)
     setLoadingTable(true)
     const res = await getBillBoards({
-      page: page
+      size: 10,
+      page: page,
+      search: search
     })
     if (res.status === 200) {
       setLoadingTable(false)
