@@ -47,7 +47,6 @@ export default function ChangePassword() {
       newPassword: password
     }
 
-    console.log(password);
     const res = await updateUserPassword(payload)
     if (res.status === 200) {
       setSuccess('Password updated successfully')

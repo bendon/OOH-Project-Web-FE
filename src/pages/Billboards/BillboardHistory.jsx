@@ -64,7 +64,7 @@ export default function BillboardHistory() {
                 <h6>{billboard && billboard.boardCode}</h6>
                 {billboard.preview ? <img className='mb-2' src={billboard.preview} width={'100%'} alt="Custom Marker" /> : <> <ShimmerThumbnail height={200} width={'100%'} /></>}
                 <p className="text-sm text-gray-600" style={{ lineHeight: '5px', fontSize: '12px' }}>
-                  <strong>Occupied:</strong> <span className="badge text-bg-danger">Not Occupied</span>
+                  {/* <strong>Occupied:</strong> <span className="badge text-bg-danger">Not Occupied</span> */}
                 </p>
                 <p className="text-sm text-gray-600" style={{ lineHeight: '5px', fontSize: '12px' }}>
                   <strong>Active:</strong> {billboard.active ? <span className="badge text-bg-success">Active</span> : <span className="badge text-bg-danger">Inactive</span>}

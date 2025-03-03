@@ -37,7 +37,7 @@ export default function RadarWeeklyUserReport({ user }) {
     useEffect(() => {
 
         const fetchWeeklyUserReport = async () => {
-            console.log(user);
+        
             
             if (user && user.userId) {
                 const res = await getUserWeeklyReport({

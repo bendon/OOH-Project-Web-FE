@@ -85,7 +85,7 @@ export default function GeolocationMap() {
     }, [selectedBillboard])
 
     const handleMapLoaded = () => {
-        console.log("map loaded")
+        // console.log("map loaded")
 
     }
 
@@ -139,13 +139,13 @@ export default function GeolocationMap() {
                                 <p className="text-sm text-gray-600" style={{ lineHeight: '5px' }}>
                                     <strong>Price:</strong> {selectedBillboard.more.price}
                                 </p>
-                                <p className="text-sm text-gray-600" style={{ lineHeight: '5px' }}>
+                                {/* <p className="text-sm text-gray-600" style={{ lineHeight: '5px' }}>
                                     <strong>Occupied:</strong> <span className="badge text-bg-danger">Not Occupied</span>
-                                </p>
-                                <div className='d-flex justify-content-between mb-2'>
-                                    {selectedBillboard.more.active ? <span className="badge text-bg-success">Active</span> : <span className="badge text-bg-danger">Inactive</span>}
-                                    {convertToHumanReadable(selectedBillboard.more.createdAt)}
-                                </div>
+                                </p> */}
+                                <div className=' mb-2'>
+                                    {selectedBillboard.more.active ? <span className="badge text-bg-success">Active</span> : <span className="badge text-bg-danger">Inactive</span>}<br/>
+                                    <p>{convertToHumanReadable(selectedBillboard.more.createdAt)}</p>
+                                </div><br/>
                                 <Link to={`/billboard/${encryptText(selectedBillboard.more.id)}/history`} className="btn btn-subtle-info me-1 mb-1 form-control" type="button"><History className='me-2' size={15} />show history</Link>
                             </div>
                         </InfoWindow>
