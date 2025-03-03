@@ -87,14 +87,14 @@ export default function DashboardPage() {
                         <div className="d-flex align-items-center icon-wrapper-sm shadow-primary-100" style={{ transform: 'rotate(-7.45deg)' }}>
                           <User size={20} className="text-primary text-primary fs-7 z-1 ms-2" />
                         </div>
-                        <p className="text-body-tertiary fs-9 mb-0 ms-2 mt-3">Outgoing call</p>
+                        <p className="text-body-tertiary fs-9 mb-0 ms-2 mt-3">users</p>
                       </div>
                       <p className="text-primary mt-2 fs-6 fw-bold mb-0 mb-sm-4">{userAnalytic ? userAnalytic.noOfUsers : 0} <span className="fs-8 text-body lh-lg">Teams</span></p>
                     </div>
-                    <div className="d-flex flex-column justify-content-center flex-between-end d-sm-block text-end text-sm-start">
+                    {/* <div className="d-flex flex-column justify-content-center flex-between-end d-sm-block text-end text-sm-start">
                       <span className="badge badge-phoenix badge-phoenix-success text-lowercase fs-10 mb-2">12 online</span>
                       <p className="mb-0 fs-9 text-body-tertiary">Total Uploaded</p>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>
@@ -112,10 +112,10 @@ export default function DashboardPage() {
                       </div>
                       <p className="text-info mt-2 fs-6 fw-bold mb-0 mb-sm-4">{billboardReport ? billboardReport.totalUploads : 0} <span className="fs-8 text-body lh-lg">Bill Boards</span></p>
                     </div>
-                    <div className="d-flex flex-column justify-content-center flex-between-end d-sm-block text-end text-sm-start">
+                    {/* <div className="d-flex flex-column justify-content-center flex-between-end d-sm-block text-end text-sm-start">
                       <span className="badge badge-phoenix badge-phoenix-success fs-10 mb-2 text-capitalize">+99% Accuracy</span>
                       <p className="mb-0 fs-9 text-body-tertiary">Than last week</p>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>

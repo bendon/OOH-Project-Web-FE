@@ -63,7 +63,7 @@ export default function DashboardChart() {
     return (
         <div>
             <div className='d-flex justify-content-between align-items-center'>
-                <h2>Bill board uploads</h2>
+                <h6>Total Monthly uploads</h6>
                 <div>
                     <select className='form-select form-control' onChange={(e) => setYearlyReport(e.target.value)}>
                         {
