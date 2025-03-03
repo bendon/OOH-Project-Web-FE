@@ -33,7 +33,9 @@ export default function GoogleMapComponent() {
 
   useEffect(() => {
     const fetchBillboards = async () => {
-      const res = await getBillBoards()
+      const res = await getBillBoards({
+        size: 1000
+      })
       if (res.status === 200) {
         setBillboards(res.data)
 
