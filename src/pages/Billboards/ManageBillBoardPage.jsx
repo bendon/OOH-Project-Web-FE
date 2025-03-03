@@ -63,7 +63,7 @@ export default function ManageBillBoardPage() {
     const res = await getBillBoards({
       size: 10,
       page: page,
-      search: search
+      
     })
     if (res.status === 200) {
       setLoadingTable(false)
