@@ -4,10 +4,11 @@ import { Link } from 'react-router'
 import BillboardUploadHourChart from '../../charts/BillboardUploadHourChart'
 import BillboardUploadDailyChart from '../../charts/BillboardUploadDailyCharts'
 import BillboardTypesChart from '../../charts/BillboardTypesChart'
-import { getBoardReport } from '../../data/lib'
+import { getBillboardTypeReport, getBoardReport } from '../../data/lib'
 
 export default function BillBoardAnalysis() {
   const [billboardReport, setBillboardReport] = useState(null)
+  const [billboardTypeReport, setBillboardTypeReport] = useState(null)
 
   useEffect(() => {
 
@@ -18,6 +19,8 @@ export default function BillBoardAnalysis() {
       }
     }
     fetchBillBoardReport()
+
+    
   },[])
   return (
     <>
@@ -69,7 +72,7 @@ export default function BillBoardAnalysis() {
         <div className='col-xxl-6'>
           <BillboardTypesChart />
         </div>
-        <div className='col-xxl-6'>
+        {/* <div className='col-xxl-6'>
           <div className='card '>
             <div className='card-header'>
               <h6>Billboard Prediction Insights</h6>
@@ -141,7 +144,7 @@ export default function BillBoardAnalysis() {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </>
   )

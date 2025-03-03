@@ -2,11 +2,13 @@ import React, { use, useEffect, useState } from 'react'
 import UserGenderChart from '../../charts/UserGenderChart'
 import { convertToHumanReadable, getStaffs, getUserAnalytics } from '../../data/lib'
 import UserRegistrationChart from '../../charts/UserRegistrationChart'
+import UserAnalysisModal from './modal/UserAnalysisModal'
 
 export default function TeamAnalysis() {
   const [gender, setGender] = useState([48, 35, 0])
   const [userAnalytic, setUserAnalytics] = useState(null)
   const [staffs, setStaffs] = useState(null)
+  const [userData, setUserData] = useState(null)
 
   useEffect(() => {
     const userAnalytics = async () => {
@@ -31,6 +33,10 @@ export default function TeamAnalysis() {
     fetchData()
     userAnalytics()
   }, [])
+
+  const fillUserData = (data) => {
+      setUserData(data)
+  }
 
   return (
     <>
@@ -113,7 +119,7 @@ export default function TeamAnalysis() {
               <tbody>
                 {staffs &&
                   staffs.data.map((staff, index) => (
-                    <tr key={index}>
+                    <tr style={{cursor: 'pointer'}} onClick={() => fillUserData(staff)} key={index} data-bs-toggle="modal" data-bs-target="#k_modal_user_analysis">
                       <td className='text-center' scope="row">{index + 1}</td>
                       <td>{staff.firstName} {staff.lastName}</td>
                       <td>{staff.email}</td>
@@ -138,6 +144,8 @@ export default function TeamAnalysis() {
           </div>
         </div>
       </div>
+
+      <UserAnalysisModal user={userData}/>
 
     </>
   )
