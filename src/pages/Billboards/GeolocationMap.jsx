@@ -135,7 +135,7 @@ export default function GeolocationMap() {
                                 <h6 className="text-lg font-semibold">BillBoard Code : {selectedBillboard.title}</h6>
                                 {selectedBillboard.image ? <img className='mb-2' src={selectedBillboard.image} width={'100%'} height={200} alt="Custom Marker" /> : <> <ShimmerThumbnail height={200} width={'100%'} /></>}
 
-                                <p style={{ lineHeight: '5px' }}>This is bill boards in westlands</p>
+                                <p style={{ lineHeight: '5px' }}>This is bill boards in {selectedBillboard.more.location}</p>
                                 <p className="text-sm text-gray-600" style={{ lineHeight: '5px' }}>
                                     <strong>Price:</strong> {selectedBillboard.more.price}
                                 </p>

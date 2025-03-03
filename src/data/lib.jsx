@@ -1020,6 +1020,29 @@ export async function getBillboardTypeReport(payload) {
     }
 }
 
+export async function getBillboardHistory(billBoardId) {
+    try {
+        const res  = await axiosApp.get(getApiUrl()+'/en/sl/billboard/history/'+billBoardId+"/campaigns", {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            }
+        })
+        return {
+            status: 200,
+            data: res.data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
 
 
 

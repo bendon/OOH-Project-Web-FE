@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { convertToHumanReadable, decryptText, getBoardById, getFileStream } from '../../data/lib';
+import { convertToHumanReadable, decryptText, getBillboardHistory, getBoardById, getFileStream } from '../../data/lib';
 import { Link, useParams } from 'react-router';
 import { ClipboardCheck, MapPin } from 'lucide-react';
 import { ShimmerContentBlock, ShimmerThumbnail } from 'react-shimmer-effects';
@@ -10,6 +10,7 @@ export default function BillboardHistory() {
   const id = decryptText(billboardId)
   const [billboard, setBillboard] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [history, setHistory] = useState(null)
 
   useEffect(() => {
 
@@ -23,10 +24,20 @@ export default function BillboardHistory() {
     }
     fetchBillboard()
 
+    const fetchHistory = async () => {
+      setHistory(null)
+      const res = await getBillboardHistory(id)
+      if (res.status === 200) {
+        setHistory(res.data)
+      }
+    }
+    fetchHistory()
+
   }, [id])
 
   useEffect(() => {
     const fetchBillboardImage = async () => {
+
       if (billboard !== null && !billboard.preview) {
         const res = await getFileStream(billboard.image.fileName)
         if (res.status === 200) {
@@ -85,8 +96,24 @@ export default function BillboardHistory() {
               </div>
             </div>
           </div>
-          <div className='col-md-12 col-sm-6 col-xxl-4'>
+          <div className='col-md-12 col-sm-6 col-xxl-8'>
             <h5> History</h5>
+            {history ?  history.data.map((item, index) => (
+              <div className='card mb-3' key={index}>
+                <div className='card-body'>
+                  <h6>Brand : {item.campaignBrand}</h6>
+                  <h6>Description </h6>
+                  <p>{item.campaignDescription}</p>
+
+                  {item.location && <p className="text-sm "><b>Location : </b>{item.location}</p>}
+                  {item.clientFirstName && <p className="text-sm "><b>Client : </b> {item.clientFirstName} {item.clientLastName}</p>}
+                  <p className="text-sm text-gray-600" style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <strong>Date:</strong> {convertToHumanReadable(item.createdAt)}
+                  </p>
+                  
+                </div>
+              </div>
+            )) : ''}
           </div>
         </div>}
        
