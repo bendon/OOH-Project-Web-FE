@@ -49,7 +49,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/manage-boards" element={<ManageBillBoardPage />} />
         <Route path="/create-board" element={<CreateBillboardPage />} />
         <Route path="/billboard-locations" element={<GeolocationMap />} />
-        <Route path="/billboard/:billboardId/history" element={<BillboardHistory />} />
+        <Route path="/billboard-info/:billboardId/history" element={<BillboardHistory />} />
         <Route path="/account" element={<AccountPage />} />
 
          {/* team/user  routes */}

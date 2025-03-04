@@ -152,7 +152,7 @@ export default function GeolocationMap() {
                                     {selectedBillboard.more.active ? <span className="badge text-bg-success">Active</span> : <span className="badge text-bg-danger">Inactive</span>}<br/>
                                     <p>{convertToHumanReadable(selectedBillboard.more.createdAt)}</p>
                                 </div><br/>
-                                <Link to={`/billboard/${encryptText(selectedBillboard.more.id)}/history`} className="btn btn-subtle-info me-1 mb-1 form-control" type="button"><History className='me-2' size={15} />show history</Link>
+                                <Link to={`/billboard-info/${encryptText(selectedBillboard.more.id)}/history`} className="btn btn-subtle-info me-1 mb-1 form-control" type="button"><History className='me-2' size={15} />show history</Link>
                             </div>
                         </InfoWindow>
                     )}
