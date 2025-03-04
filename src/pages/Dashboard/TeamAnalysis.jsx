@@ -119,9 +119,9 @@ export default function TeamAnalysis() {
               <tbody>
                 {staffs &&
                   staffs.data.map((staff, index) => (
-                    <tr style={{cursor: 'pointer'}} onClick={() => fillUserData(staff)} key={index} data-bs-toggle="modal" data-bs-target="#k_modal_user_analysis">
+                    <tr style={{cursor: 'pointer'}} onClick={() => fillUserData(staff)} key={index} data-bs-toggle="modal" data-bs-target="#k_modal_user_analysis" >
                       <td className='text-center' scope="row">{index + 1}</td>
-                      <td>{staff.firstName} {staff.lastName}</td>
+                      <td data-bs-toggle="tooltip" data-bs-placement="top" title="Click to view Analysis">{staff.firstName} {staff.lastName}</td>
                       <td>{staff.email}</td>
                       <td>{staff.country}</td>
                       <td>{staff.phone}</td>
