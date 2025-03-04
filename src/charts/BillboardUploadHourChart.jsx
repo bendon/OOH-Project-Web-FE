@@ -62,7 +62,6 @@ export default function BillboardUploadHourChart() {
 
 
   useEffect(() => {
-console.log(monthReport);
 
     const data = monthReport.map(item => {
       return {

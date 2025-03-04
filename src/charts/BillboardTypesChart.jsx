@@ -56,7 +56,6 @@ export default function BillboardTypesChart() {
         if(billboardTypes !== null && billboardTypes.data !== null)
         {
 
-            console.log(billboardTypes.data);
             
             const data = billboardTypes.data.map((item) => {
                 return {
@@ -66,7 +65,7 @@ export default function BillboardTypesChart() {
             })
 
             const categories = data.map((report) => report.type)
-            console.log(categories);
+
             
             options.xaxis.categories = categories
 
@@ -76,7 +75,7 @@ export default function BillboardTypesChart() {
             // }))
 
             const values = data.map((report) => report.counts)
-            console.log(values);
+    
 
             series[0].data = values
 

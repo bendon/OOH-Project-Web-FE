@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, ChartColumnStacked, ChartNoAxesCombined, FolderKanban, Key, LayoutDashboard, Lock, MapPinHouse, MonitorCog, ReceiptText, Shield, ShieldCheck, SquarePlus, UserPlus, UserRoundCog, Users } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ChartColumnStacked, ChartNoAxesCombined, FolderKanban, Key, LayoutDashboard, Lock, MapPinHouse, MonitorCog, ReceiptText, Sheet, Shield, ShieldCheck, SquarePlus, UserPlus, UserRoundCog, Users } from 'lucide-react'
 import React from 'react'
 import { NavLink, useNavigate } from 'react-router'
 import { postUserLogOut } from '../data/lib'
@@ -73,6 +73,14 @@ export default function SideBar() {
                         <div className="d-flex align-items-center">
                             <span className="nav-link-icon"> <MapPinHouse size={18} className='icon'/> </span>
                             <span className="nav-link-text-wrapper"><span className="nav-link-text">Geolocations</span></span>
+                        </div>
+                    </NavLink>
+                </div>
+                <div className="nav-item-wrapper">
+                    <NavLink className="nav-link label-1" to="/billboard-reports" role="button" data-bs-toggle="" aria-expanded="false">
+                        <div className="d-flex align-items-center">
+                            <span className="nav-link-icon"> <Sheet size={18} className='icon'/> </span>
+                            <span className="nav-link-text-wrapper"><span className="nav-link-text">Report</span></span>
                         </div>
                     </NavLink>
                 </div>

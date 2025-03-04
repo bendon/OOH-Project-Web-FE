@@ -4,6 +4,8 @@ import { getBoardWeeklyReport } from '../data/lib';
 import flatpickr from 'flatpickr';
 import "flatpickr/dist/flatpickr.min.css";
 import { getISOWeek, getYear, getMonth } from "date-fns";
+import { getFullDateFromWeek } from '../data/Utilities';
+import DailyUploadsReport from '../pages/Dashboard/modal/DailyUploadsReport';
 
 export default function BillboardUploadDailyChart() {
   const today = new Date();
@@ -11,6 +13,7 @@ export default function BillboardUploadDailyChart() {
   const [dateFilter, setDateFilter] = useState([getYear(today),getMonth(today) + 1,getISOWeek(today)]);
 
 
+  const [dayDate, setDayDate] = useState(null)
   const [chartKey, setChartKey] = useState(0);
   const [weeklyReport, setWeeklyReport] = useState([])
   const [series,setSeries] = useState([{
@@ -20,7 +23,7 @@ export default function BillboardUploadDailyChart() {
   }]);
   const options = {
     chart: {
-      type: "line",
+      type: "bar",
       height: 270,
       toolbar: {
         show: false
@@ -28,6 +31,22 @@ export default function BillboardUploadDailyChart() {
       zoom: {
         enabled: false,
       },
+      events: {
+        dataPointSelection: (event, chartContext, { dataPointIndex }) => {
+          const index = dataPointIndex;
+          const data = chartContext.w.config.series[0].data[dataPointIndex];
+
+          
+          
+        const dayName = options.xaxis.categories[dataPointIndex]; // Get the day name
+        const weekNumber = dateFilter[2];
+
+          const date = getFullDateFromWeek(dateFilter[0], dateFilter[2], dayName);
+          setDayDate(date);
+          $('#k_modal_daily_report_uploads').modal('show');
+       
+        }
+      }
     },
     // title: {
     //   text: "Billboard Uploads by Day of Week"
@@ -149,8 +168,9 @@ export default function BillboardUploadDailyChart() {
             <input type="text" className='week-picker' placeholder='Enter Year' ref={inputRef} style={{ display: "none" }}/>
           </div>
         </div>
-        <Chart key={chartKey} options={options} series={series} type="line" height={270} />
+        <Chart key={chartKey} options={options} series={series} type="bar" height={270} />
       </div>
+      <DailyUploadsReport dayDate={dayDate} />
     </>
   )
 }

@@ -25,6 +25,7 @@ import RoleSettings from './pages/administration/RoleSettings.jsx'
 import NotFoundPage from './pages/NotFound/NotFoundPage.jsx'
 import BillboardHistory from './pages/Billboards/BillboardHistory.jsx'
 import TeamPermissionDetails from './pages/Team/TeamPermissionDetails.jsx'
+import BillboardReport from './pages/Dashboard/BillboardReport.jsx'
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
@@ -50,6 +51,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/create-board" element={<CreateBillboardPage />} />
         <Route path="/billboard-locations" element={<GeolocationMap />} />
         <Route path="/billboard-info/:billboardId/history" element={<BillboardHistory />} />
+        <Route path="/billboard-reports" element={<BillboardReport />} />
         <Route path="/account" element={<AccountPage />} />
 
          {/* team/user  routes */}
