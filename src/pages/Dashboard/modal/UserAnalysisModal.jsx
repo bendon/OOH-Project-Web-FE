@@ -3,6 +3,7 @@ import { convertToHumanReadable, getUserMonthlyReport } from '../../../data/lib'
 import { getISOWeek, getYear, getMonth,subMonths } from "date-fns";
 import YearlyUserReport from './YearlyUserReport';
 import RadarWeeklyUserReport from './RadarWeeklyUserReport';
+import GeolocationUserUploads from './GeolocationUserUploads';
 
 export default function UserAnalysisModal({ user }) {
     const userInfo = user
@@ -95,6 +96,9 @@ export default function UserAnalysisModal({ user }) {
                                         </div>
                                         <div className='col-md-12'>
                                             {userInfo && <YearlyUserReport user={userInfo} />}
+                                        </div>
+                                        <div className='col-md-12'>
+                                            {userInfo && <GeolocationUserUploads user={userInfo} />}
                                         </div>
                                     </div>
                                 </>

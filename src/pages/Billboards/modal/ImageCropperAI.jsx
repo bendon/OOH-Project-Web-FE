@@ -157,8 +157,8 @@ export default function ImageCropperAI({ image }) {
                                 <p>{fileAnalysis.campaign_description}</p>
                                 {fileAnalysis.location ? <p>Location : {fileAnalysis.location}</p> : ''}
                                 <h6>Contacts</h6>
-                                <p>Phone : {fileAnalysis.contact_information.phone.map((item, index)=> <span key={index}>{item}</span>)}</p>
-                                <p>Email : {fileAnalysis.contact_information.email.map((item, index)=> <span key={index}>{item}</span>)}</p>
+                                <p>Phone : {fileAnalysis.campaign_contacts.campaign_phone.map((item, index)=> <span key={index}>{item}</span>)}</p>
+                                <p>Email : {fileAnalysis.campaign_contacts.campaign_email.map((item, index)=> <span key={index}>{item}</span>)}</p>
                                 <h6>Target Audience</h6>
                                 <p>{fileAnalysis.target_audience}</p>
                                 <h6>Additional Insights</h6>
@@ -172,6 +172,11 @@ export default function ImageCropperAI({ image }) {
                                 <p>Width : {fileAnalysis.billboard_measurements.width} {fileAnalysis.billboard_measurements.units}</p>
                                 <h6>Confidence Percentage</h6>
                                 <p> {fileAnalysis.percentage_accuracy}</p>
+                                <h6>Owner Details</h6>
+                                <p>Name : {fileAnalysis.owner.owner_name}</p>
+                                <p>Phone : {fileAnalysis.owner.owner_phone.map((item, index)=> <span key={index}>{item}, </span>)}</p>
+                                <p>Email : {fileAnalysis.owner.owner_email.map((item, index)=> <span key={index}>{item}, </span>)}</p>
+                                <p>Site : {fileAnalysis.owner.owner_website}</p>
                                 </>}
                                 </div>
                             </div>

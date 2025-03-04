@@ -1043,6 +1043,30 @@ export async function getBillboardHistory(billBoardId) {
     }
 }
 
+export async function getUserBillboardUploads( payload) {
+    try {
+        const search = searchableQuery(payload)
+        const res  = await axiosApp.get(getApiUrl()+'/en/sl/my/billboardds/uploads'+search, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            }
+        })
+        return {
+            status: 200,
+            data: res.data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
 
 
 

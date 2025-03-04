@@ -1,112 +1,63 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { APIProvider, Map, AdvancedMarker, InfoWindow, useMap } from '@vis.gl/react-google-maps';
-import { ClipboardCheck, History } from 'lucide-react';
-import { Link } from 'react-router';
-import { convertToHumanReadable, encryptText, getBillBoards, getFileStream } from '../../data/lib';
-import BillboardLogo from '../../assets/billboard.png'
+import { convertToHumanReadable, getUserBillboardUploads } from '../../../data/lib';
+import BillboardLogo from '../../../assets/billboard.png'
 import { ShimmerThumbnail } from "react-shimmer-effects";
-import GooglePlacesAutocomplete from '../../components/SearchLocation';
+import { Link } from 'react-router';
+import { History } from 'lucide-react';
 
-const TrafficLayer = () => {
-    const map = useMap(); // Get the map instance
-
-    useEffect(() => {
-        if (!map) return;
-
-        const trafficLayer = new window.google.maps.TrafficLayer();
-        trafficLayer.setMap(map);
-
-        return () => {
-            trafficLayer.setMap(null); // Clean up the layer when component unmounts
-        };
-    }, [map]);
-
-    return null; // This component doesn't render anything
-};
-
-export default function GeolocationMap() {
-    const [billboards, setBillboards] = useState(null)
+export default function GeolocationUserUploads({ user }) {
+    const [userUploads, setUserUploads] = useState(null)
     const [locations, setLocations] = useState([{ key: 'operaHouse', location: { lat: -33.8567844, lng: 151.213108 } }])
     const [center, setCenter] = useState({ lat: -1.2647263, lng: 36.80201 });
     const [selectedBillboard, setSelectedBillboard] = useState(null);;
 
-
     useEffect(() => {
-        const fetchBillboards = async () => {
-            const res = await getBillBoards({
+        const fetchUserUploadsReport = async () => {
+            const res = await getUserBillboardUploads({
                 size: 1000
             })
             if (res.status === 200) {
-                setBillboards(res.data)
-
+                setUserUploads(res.data)
             }
         }
-        fetchBillboards()
+        fetchUserUploadsReport()
     }, [])
 
+
     useEffect(() => {
-        mapUpdateLocation()
-    }, [billboards])
-
-    const mapUpdateLocation = () => {
         setTimeout(() => {
-            if (billboards !== null && billboards.data.length > 0) {
-                setCenter({ lat: billboards.data[0].latitude, lng: billboards.data[0].longitude })
-
-                const locations = billboards.data.map(billboard => {
+            if (userUploads && userUploads.data.length > 0) {
+                const billboards = userUploads.data.map(billboard => {
                     return {
+                        key: billboard.id,
+                        title: billboard.boardCode,
+                        more: billboard,
                         location: {
                             lat: billboard.latitude,
                             lng: billboard.longitude
-                        },
-                        key: billboard.id,
-                        title: billboard.boardCode,
-                        more: billboard
+                        }
                     }
                 })
-                setLocations(locations)
+                setLocations(billboards)
             }
         }, 3000)
 
-    }
+    }, [userUploads])
 
     const handleSelectedBillboard = async (billboard) => {
         setSelectedBillboard(null)
         setSelectedBillboard(billboard)
     }
 
-    useEffect(() => {
-        const fetchBillboardImage = async () => {
-            if (selectedBillboard !== null && !selectedBillboard.image) {
-                const res = await getFileStream(selectedBillboard.more.image.fileName)
-                if (res.status === 200) {
-                    setSelectedBillboard({ ...selectedBillboard, image: res.data })
-                }
-            }
-        }
-        fetchBillboardImage()
-    }, [selectedBillboard])
 
     const handleMapLoaded = () => {
         // console.log("map loaded")
 
     }
 
-
-
-    //{ lat: -1.2647263, lng: 36.80201 }
     return (
         <>
-            <div className='d-flex justify-content-between'>
-                <h4>Billboard Location</h4>
-                <div>
-                    <GooglePlacesAutocomplete onPlaceSelected={(place) => {
-                        setCenter({ lat: place.geometry.location.lat(), lng: place.geometry.location.lng() })
-                    }} />
-                    <Link to="/manage-boards" className='btn btn-outline-primary' style={{ fontSize: '12px' }}><ClipboardCheck size={15} /> Billboard Management</Link>
-                </div>
-            </div>
-            <hr />
             <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAP_KEY} onLoad={() => handleMapLoaded()}>
                 <Map
 
@@ -116,7 +67,7 @@ export default function GeolocationMap() {
                     className="map-container"
                 >,
 
-                    <TrafficLayer /> {/* Add traffic layer component */}
+
 
                     {locations.map((loc) => (
                         <AdvancedMarker
@@ -146,12 +97,12 @@ export default function GeolocationMap() {
                                     <strong>Price:</strong> {selectedBillboard.more.price}
                                 </p>
                                 {/* <p className="text-sm text-gray-600" style={{ lineHeight: '5px' }}>
-                                    <strong>Occupied:</strong> <span className="badge text-bg-danger">Not Occupied</span>
-                                </p> */}
+                            <strong>Occupied:</strong> <span className="badge text-bg-danger">Not Occupied</span>
+                        </p> */}
                                 <div className=' mb-2'>
-                                    {selectedBillboard.more.active ? <span className="badge text-bg-success">Active</span> : <span className="badge text-bg-danger">Inactive</span>}<br/>
+                                    {selectedBillboard.more.active ? <span className="badge text-bg-success">Active</span> : <span className="badge text-bg-danger">Inactive</span>}<br />
                                     <p>{convertToHumanReadable(selectedBillboard.more.createdAt)}</p>
-                                </div><br/>
+                                </div><br />
                                 <Link to={`/billboard/${encryptText(selectedBillboard.more.id)}/history`} className="btn btn-subtle-info me-1 mb-1 form-control" type="button"><History className='me-2' size={15} />show history</Link>
                             </div>
                         </InfoWindow>
