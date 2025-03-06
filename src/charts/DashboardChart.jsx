@@ -13,7 +13,7 @@ export default function DashboardChart() {
     const [chartKey, setChartKey] = useState(0);
 
     // array of years from 2025 to 2040
-    const years = Array.from({ length: 16 }, (_, i) => 2025 + i);
+    const years = Array.from({ length: 1 }, (_, i) => 2025 + i);
 
     const options = {
         chart: {

@@ -26,6 +26,7 @@ import NotFoundPage from './pages/NotFound/NotFoundPage.jsx'
 import BillboardHistory from './pages/Billboards/BillboardHistory.jsx'
 import TeamPermissionDetails from './pages/Team/TeamPermissionDetails.jsx'
 import BillboardReport from './pages/Dashboard/BillboardReport.jsx'
+import PowerProjectLanding from './pages/Auth/Test.jsx'
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
@@ -33,6 +34,7 @@ createRoot(document.getElementById('root')).render(
       {/* Public Routes (Login, Signup, etc.) */}
       <Route element={<PublicLayout />}>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/test" element={<PowerProjectLanding />} />
       </Route>
 
 
