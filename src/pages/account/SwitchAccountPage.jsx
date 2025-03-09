@@ -14,7 +14,6 @@ export default function SwitchAccountPage() {
 
             if(session.user.isChange) {
                 navigate('/reset-password')
-                return
             }
             
             setSession(session)
@@ -30,7 +29,7 @@ export default function SwitchAccountPage() {
             setAccount(response.data)
         }
         setAccounts()
-    }, [])
+    }, [currentSession])
 
     const checkOutAccount = async () => {
         const formData = new FormData()

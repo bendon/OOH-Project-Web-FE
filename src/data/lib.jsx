@@ -285,7 +285,7 @@ export async function postSwitchAccount(formData) {
         }
 
         localStorage.setItem('_rtn', encryptText(data.refreshToken))
-        localStorage.setItem('_pm', encryptText(JSON.stringify(data.permissions)))
+        localStorage.setItem('_pm', data.permissions? encryptText(JSON.stringify(data.permissions)) :  encryptText(JSON.stringify([])))
 
         const encryted =  encryptText(JSON.stringify(sessionUser));
       
