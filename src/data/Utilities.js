@@ -71,11 +71,11 @@ export function getJoinedTime(unixTimestamp) {
     for (const unit of units) {
       const interval = Math.floor(diffInSeconds / unit.seconds);
       if (interval >= 1) {
-        return `Joined ${rtf.format(-interval, unit.name)}`;
+        return ` ${rtf.format(-interval, unit.name)}`;
       }
     }
   
-    return 'Joined just now';
+    return ' just now';
   }
 
 export const getFullDateFromWeek = (year, weekNumber, dayName) => {
@@ -118,3 +118,19 @@ export const getFullDateFromWeek = (year, weekNumber, dayName) => {
   export const getLocalDate = () => {
     return new Date().toLocaleDateString("en-CA"); // en-CA ensures YYYY-MM-DD format
   };
+
+  export const  bytesToMB = (bytes, decimals = 2)  =>{
+    if (typeof bytes !== 'number') {
+        return 'Invalid input';
+      }
+    
+      if (bytes === 0) return '0 Bytes';
+    
+      const k = 1024;
+      const dm = decimals < 0 ? 0 : decimals;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+    
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  }

@@ -30,6 +30,7 @@ import PowerProjectLanding from './pages/Auth/Test.jsx'
 import ForgotPassword from './pages/Auth/ForgotPassword.jsx'
 import AuthLayout from './layout/AuthLayout.jsx'
 import ResetPassword from './pages/Auth/ResetPassword.jsx'
+import BillboardGallery from './pages/Billboards/gallery/BillboardGallery.jsx'
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
@@ -63,6 +64,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/billboard-locations" element={<GeolocationMap />} />
         <Route path="/billboard-info/:billboardId/history" element={<BillboardHistory />} />
         <Route path="/billboard-reports" element={<BillboardReport />} />
+        <Route path="/file-gallery" element={<BillboardGallery />} />
         <Route path="/account" element={<AccountPage />} />
 
          {/* team/user  routes */}
