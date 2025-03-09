@@ -30,7 +30,7 @@ export default function SwitchAccountPage() {
             setAccount(response.data)
         }
         setAccounts()
-    }, [currentSession])
+    }, [])
 
     const checkOutAccount = async () => {
         const formData = new FormData()
