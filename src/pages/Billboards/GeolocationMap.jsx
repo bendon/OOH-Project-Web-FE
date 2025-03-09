@@ -7,6 +7,7 @@ import BillboardLogo from '../../assets/billboard.png'
 import { ShimmerThumbnail } from "react-shimmer-effects";
 import GooglePlacesAutocomplete from '../../components/SearchLocation';
 
+
 const TrafficLayer = () => {
     const map = useMap(); // Get the map instance
 
@@ -29,7 +30,24 @@ export default function GeolocationMap() {
     const [locations, setLocations] = useState([{ key: 'operaHouse', location: { lat: -33.8567844, lng: 151.213108 } }])
     const [center, setCenter] = useState({ lat: -1.2647263, lng: 36.80201 });
     const [selectedBillboard, setSelectedBillboard] = useState(null);;
-
+    const [polygonCoordinates, setPolygonCoordinates] = useState([
+        {
+            "lat": -0.4233130737472416,
+            "lng": 35.96048355500845
+        },
+        {
+            "lat": -0.4233130737472416,
+            "lng": 36.19723723446084
+        },
+        {
+            "lat": -0.2083105525442332,
+            "lng": 36.19723723446084
+        },
+        {
+            "lat": -0.2083105525442332,
+            "lng": 35.96048355500845
+        }
+    ]);
 
     useEffect(() => {
         const fetchBillboards = async () => {
@@ -92,26 +110,44 @@ export default function GeolocationMap() {
 
     }
 
+    const handleSelectedPlace = (place) => {
+        setCenter({lat : place.latitude, lng : place.longitude});
+        setPolygonCoordinates(place.boundaryCoords)
+        
+    }
+
+    useEffect(() => {
+        // This effect will trigger whenever the center changes
+        setCenter(center); // Update center based on prop or state change
+
+    }, [center]);
 
 
     //{ lat: -1.2647263, lng: 36.80201 }
     return (
         <>
-            <div className='d-flex justify-content-between'>
-                <h4>Billboard Location</h4>
-                <div>
-                    <GooglePlacesAutocomplete onPlaceSelected={(place) => {
-                        setCenter({ lat: place.geometry.location.lat(), lng: place.geometry.location.lng() })
+            <div className='broad '>
+                <div className='col-lg-4'>
+                <h4 className='mb-3'>Billboard Location</h4>
+                <div className=''>
+            <GooglePlacesAutocomplete onPlaceSelected={(place) => {
+                      handleSelectedPlace(place)
                     }} />
-                    <Link to="/manage-boards" className='btn btn-outline-primary' style={{ fontSize: '12px' }}><ClipboardCheck size={15} /> Billboard Management</Link>
+            </div>
+                </div>
+                <div className='actions'>
+                    <Link to="/manage-boards" className='btn btn-outline-primary mt-3' style={{ fontSize: '12px' }}><ClipboardCheck size={15} /> Billboard Management</Link>
                 </div>
             </div>
             <hr />
+            
             <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAP_KEY} onLoad={() => handleMapLoaded()}>
                 <Map
 
+
                     defaultZoom={13}
-                    defaultCenter={center}
+                    // defaultCenter={center}
+                    center={center}
                     mapId={import.meta.env.VITE_GOOGLE_MAP_ID}
                     className="map-container"
                 >,
@@ -128,6 +164,7 @@ export default function GeolocationMap() {
                             <img src={BillboardLogo} width={40} height={40} alt="Custom Marker" />
                         </AdvancedMarker>
                     ))}
+
 
                     {selectedBillboard && (
                         <InfoWindow

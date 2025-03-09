@@ -1,15 +1,20 @@
-import { Calendar, House, Phone, ShieldX, User, Users } from 'lucide-react'
+import { Calendar, CheckCheck, House, Phone, ShieldX, User, Users, X } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router'
-import { convertToHumanReadable, decryptText, getOrganizationPermisions, getOrganizationStaffPermissions, getStaffById } from '../../data/lib'
+import { convertToHumanReadable, decryptText, getOrganizationPermisions, getOrganizationStaffPermissions, getStaffById, updateUserPermissions } from '../../data/lib'
+import { set } from 'date-fns';
 
 export default function TeamPermissionDetails() {
     const { staffId } = useParams();
     const [permission, setPermission] = useState(null)
-    const  [staffPermission, setStaffPermission] = useState(null)
+    const [staffPermission, setStaffPermission] = useState(null)
     const [granted, setGranted] = useState(false)
     const [staff, setStaff] = useState(null)
     const id = decryptText(staffId)
+    const [selectedPermission, setSelectedPermission] = useState([])
+    const [updating, setUpdating] = useState(false)
+    const [loadingPost, setLoadingPost] = useState(false)
+    const [updated, setUpdated] = useState(false)
 
     useEffect(() => {
         const fetchPermission = async () => {
@@ -24,6 +29,8 @@ export default function TeamPermissionDetails() {
 
         const fetchStaff = async () => {
             const res = await getStaffById(id)
+
+
             if (res.status === 200) {
                 setStaff(res.data)
             }
@@ -32,19 +39,26 @@ export default function TeamPermissionDetails() {
         fetchPermission()
     }, [])
 
-    useEffect(()=>{
+    useEffect(() => {
 
         const fetchStaffPermission = async () => {
+
             const res = await getOrganizationStaffPermissions(id)
+
             if (res.status === 200) {
                 setStaffPermission(res.data)
+                const permissionArrayId = res.data.map(p => p.id)
+
+
+                selectedPermission.push(...permissionArrayId)
             }
+
             if (res.status === 403) {
                 setGranted(true)
             }
         }
         fetchStaffPermission()
-    },[permission])
+    }, [permission])
 
     const isAssigned = (permission) => {
         const granted = staffPermission.find(p => p.name === permission)
@@ -54,7 +68,48 @@ export default function TeamPermissionDetails() {
         return false
     }
 
+
     const setUserPermission = (e) => {
+        setUpdating(true)
+        const item = e.target.value
+
+        if (selectedPermission.includes(item)) {
+            setSelectedPermission(selectedPermission.filter(p => p !== item))
+        } else {
+            if (selectedPermission.length < 1) {
+                setSelectedPermission([item])
+            }
+            else {
+                setSelectedPermission([...selectedPermission, item])
+            }
+        }
+    }
+
+    const updateUserNewPermissions = async () => {
+        setLoadingPost(true)
+        setUpdating(false)
+        const payload = {
+            data: {
+                permissionIds: selectedPermission
+            },
+            staffId: id
+        }
+        const res = await updateUserPermissions(payload)
+
+        if (res.status === 200) {
+            setUpdated(true)
+            setLoadingPost(false)
+            setUpdating(false)
+            console.log(res.data);
+
+            setTimeout(() => {
+                setUpdated(false)
+            }, 3000);
+        }else {
+            setUpdating(true)
+            setUpdated(false)
+            setLoadingPost(false)
+        }
 
     }
     return (
@@ -119,6 +174,20 @@ export default function TeamPermissionDetails() {
                     </table>
                 </div>
             </>}
+            <div className='p-3 mb-3 mt-3 flex justify-content-between align-items-center'>
+                <h5>Update Permission</h5>
+                {selectedPermission.length > 0 && updating && <button type="button" onClick={updateUserNewPermissions} className="btn btn-subtle-primary">Save Changess</button>}
+            </div>
+            {updated && <div className="alert alert-success d-flex align-items-center" role="alert">
+                <CheckCheck scale={18} className='me-3' />
+                <p className="mb-0 flex-1">A simple primary alert—check it out!</p>
+            </div>}
+            {loadingPost && <div className="alert alert-subtle-primary d-flex align-items-center me-3" role="alert">
+                <div className="spinner-border text-primary me-3" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </div>
+                <p className="mb-0 flex-1">Please wait updating user permissions ....</p>
+            </div> }
 
             {granted && <div className="alert alert-subtle-warning" role="alert"><ShieldX size={18} /> Access Denied</div>}
             <div className='row'>
@@ -131,8 +200,8 @@ export default function TeamPermissionDetails() {
                             <div className='card-body' key={Math.random()}>
                                 {items.map((item, index) => <>
                                     <div className="form-check mb-2" key={index}>
-                                        <input onChange={()=>setUserPermission(item)} id={item.id} className="form-check-input input-light-success" type="checkbox" />
-                                        <label className="form-check-label cursor-pointer">{item.name}</label>
+                                        <input checked={selectedPermission.includes(item.id)} value={item.id} onChange={(e) => setUserPermission(e)} id={item.id} className="form-check-input input-light-success" type="checkbox" />
+                                        <label className="form-check-label cursor-pointer" htmlFor={item.id}>{item.name}</label>
                                     </div>
                                 </>)}
                             </div>

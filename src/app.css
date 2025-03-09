@@ -1,0 +1,57 @@
+/* @import "choices.js/src/styles/choices"; */
+
+.choices__inner {
+    background-color: #f0f0f0; /* Change the background color of the input box */
+    color: #333;               /* Change the text color */
+    border: 1px solid #ccc;    /* Change the border color */
+}
+
+
+
+/* Custom styling for selected item */
+
+.choices__item--disabled {
+    color: #999; /* Grey out disabled items */
+}
+
+/* Hover effect for dropdown options */
+.choices__item:hover, .is-highlighted {
+    background-color: #3874ff !important; /* Set background color to #3874ff */
+    color: #fff !important;               /* Set text color to white (#fff) */
+}
+
+.choices__list.choices__list--dropdown {
+    position: relative;
+    width: auto !important;
+    white-space: nowrap; /* Prevent text from wrapping inside the dropdown */
+    /* overflow: hidden;  */
+}
+
+.broad {
+    display: flex;
+    flex-direction:row;
+    justify-content: space-between;
+}
+
+.braod .actions{
+    display: flex ;
+    flex-direction:row ;
+}
+
+@media screen and (max-width: 768px) {
+    .broad {
+        flex-direction: column;
+    }
+    .broad .actions{
+        gap: 10px;
+        flex-direction: column;
+    }
+    .choices__list.choices__list--dropdown {
+        position: absolute;
+        z-index: 1000;
+        width: auto ;
+        white-space: wrap; /* Prevent text from wrapping inside the dropdown */
+        /* overflow: hidden;  */
+    }
+    
+}

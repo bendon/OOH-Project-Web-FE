@@ -11,9 +11,15 @@ export default function SideBar() {
         if (res.status === 200) {
             navigate('/login')
         } else {
-            console.log(res.error)
         }
     }
+    $(document).ready(function () {
+        $(".nav-item-wrapper .nav-link").click(function () {
+            $("#navbarVerticalCollapse").removeClass("show");
+            
+        });
+    });
+    
   return (
     <nav className="navbar navbar-vertical navbar-expand-lg">
         <div className="collapse navbar-collapse" id="navbarVerticalCollapse">

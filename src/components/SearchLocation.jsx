@@ -1,89 +1,177 @@
 import { useEffect, useRef, useState } from "react";
 import Choices from "choices.js";
+import { Loader } from "@googlemaps/js-api-loader";
+import "choices.js/public/assets/styles/choices.css";
 
-const GooglePlacesAutocomplete = ({ onPlaceSelected }) => {
-  const [selectedPlace, setSelectedPlace] = useState(null);
-  const autocompleteServiceRef = useRef(null);
-  const placesServiceRef = useRef(null);
-  const choicesInstanceRef = useRef(null);
+const GooglePlacesAutocomplete = ({onPlaceSelected}) => {
+  const selectRef = useRef(null);
+  const choicesInstance = useRef(null);
+  const [placesService, setPlacesService] = useState(null);
+  const [predictions, setPredictions] = useState([]);
+  const [preciseLocation, setPreciseLocation] = useState([]);
+  let loader = null
+  const [loadedChoice, setLoadedChoice] = useState(false);
 
   useEffect(() => {
-    if (!window.google) return;
-    autocompleteServiceRef.current = new google.maps.places.AutocompleteService();
-    placesServiceRef.current = new google.maps.places.PlacesService(
-      document.createElement("div")
-    );
-
-    choicesInstanceRef.current = new Choices("#choices-user-location", {
+    if (choicesInstance.current) {
+      choicesInstance.current.destroy();
+  }
+   
+    choicesInstance.current = new Choices(selectRef.current, {
+      removeItemButton: true,
+      placeholder: true,
+      searchEnabled: true,
       paste: false,
       allowHTML: true,
       duplicateItemsAllowed: false,
       editItems: true,
-      placeholder: true,
-      placeholderValue: "Your location",
+      placeholderValue: "Search for a location",
+      searchPlaceholderValue: "Search for a location",
+
     });
+    setLoadedChoice(true)
+  }, [])
 
-    document.querySelector("#choices-user-location").addEventListener("change", (event) => {
-      const placeId = event.target.value;
-      if (placeId) {
-        handleSelectChange(placeId);
+  const startLoader = () => {
+    loader = new Loader({
+        apiKey: import.meta.env.VITE_GOOGLE_MAP_KEY, // Replace with your API key
+        version: "weekly",
+        libraries: ["places"],
+      });
+  }
+
+  useEffect(() => {
+
+    setTimeout(() => {
+      startLoader()
+       
+      if (loadedChoice) {
+        initializeMapSelect()
       }
-    });
-  }, []);
-
-  const handleInputChange = (inputValue) => {
-    if (!inputValue || !autocompleteServiceRef.current) return;
-
-    autocompleteServiceRef.current.getPlacePredictions(
-      { input: inputValue },
-      (predictions, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK) {
-          const choices = predictions.map((prediction) => ({
-            value: prediction.place_id,
-            label: prediction.description,
-          }));
-          
-          if (choicesInstanceRef.current) {
-            choicesInstanceRef.current.clearStore();
-            choicesInstanceRef.current.setChoices(choices, "value", "label", true);
-          }
-        }
-      }
-    );
-  };
-
-  const handleSelectChange = (placeId) => {
-    if (!placeId || !placesServiceRef.current) return;
+    }, 2000);
     
-    placesServiceRef.current.getDetails(
-      { placeId },
-      (result, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK) {
-          setSelectedPlace(result);
-          let accuracy = 0;
-          if (result.geometry.viewport) {
-            const bounds = result.geometry.viewport;
-            const latDiff = bounds.getNorthEast().lat() - bounds.getSouthWest().lat();
-            const lngDiff = bounds.getNorthEast().lng() - bounds.getSouthWest().lng();
-            accuracy = Math.max(latDiff, lngDiff) * 111000;
-          }
+  }, [loadedChoice]);
 
-          onPlaceSelected({
-            name: result.name,
-            latitude: result.geometry.location.lat(),
-            longitude: result.geometry.location.lng(),
-            accuracy,
-          });
+
+  const initializeMapSelect = async () => {
+    if (!loader) return;
+
+    try {
+        // Load Maps and Places libraries
+        const [maps, places] = await Promise.all([
+            loader.importLibrary("maps"),
+            loader.importLibrary("places") // ✅ Load the places library correctly
+        ]);
+
+        console.log("Google Maps API Loaded");
+
+        if (!places) {
+            console.error("Google Places library failed to load");
+            return;
         }
+
+        // ✅ Ensure `AutocompleteService` is accessed properly
+        const autocompleteService = new google.maps.places.AutocompleteService();
+
+        const inputElement = document.querySelector('div.search_location input[type="search"]');
+
+
+        if (inputElement) {
+            inputElement.addEventListener("keyup", (event) => {
+                const searchQuery = event.target.value;
+                getPredictions(searchQuery);
+            });
+        }
+
+        const getPredictions = (input) => {
+            if (!input) return;
+
+            autocompleteService.getPlacePredictions({ input }, (predictions, status) => {
+                if (status === google.maps.places.PlacesServiceStatus.OK) {
+                    setPreciseLocation(predictions);
+                    updateChoices(predictions);
+                } else {
+                    setPreciseLocation([]);
+                }
+            });
+        };
+
+        const updateChoices = (predictions) => {
+            const choices = predictions.map((prediction) => ({
+                value: prediction.place_id,
+                label: prediction.description,
+            }));
+            console.log(choices);
+
+            if (choicesInstance.current) {
+                choicesInstance.current.clearStore(); // Clear previous options
+                choicesInstance.current.setChoices(choices); // Add new location options
+            }
+        };
+    } catch (error) {
+        console.error("Error loading Google Maps API:", error);
+    }
+};
+
+const selectPlace = (event) => {
+  if (!loader){
+    startLoader()
+  }
+  const placeValue = event.target.value;
+  console.log(placeValue);
+
+  loader.importLibrary("places").then(() => {
+    const service = new google.maps.places.PlacesService(document.createElement('div'));
+    // Request details by place_id
+    service.getDetails({ placeId: placeValue }, (result, status) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK) {
+        setPlacesService(result); // Store the detailed result
+
+        // Calculate an approximate accuracy based on the viewport (if available)
+        let accuracy = 0;
+        let boundaryCoords = [];
+        if (result.geometry.viewport) {
+          const bounds = result.geometry.viewport;
+          const latDiff = bounds.getNorthEast().lat() - bounds.getSouthWest().lat();
+          const lngDiff = bounds.getNorthEast().lng() - bounds.getSouthWest().lng();
+
+          // Approximate accuracy as the average distance of the bounding box (in meters)
+          accuracy = Math.max(latDiff, lngDiff) * 111000; // Roughly converting degrees to meters
+
+           boundaryCoords = [
+            { lat: bounds.getSouthWest().lat(), lng: bounds.getSouthWest().lng() },
+            { lat: bounds.getSouthWest().lat(), lng: bounds.getNorthEast().lng() },
+            { lat: bounds.getNorthEast().lat(), lng: bounds.getNorthEast().lng() },
+            { lat: bounds.getNorthEast().lat(), lng: bounds.getSouthWest().lng() },
+          ];
+        }
+
+
+        const payload = {
+          name: result.name,
+          latitude: result.geometry.location.lat(),
+          longitude: result.geometry.location.lng(),
+          accuracy: accuracy,
+          boundaryCoords: boundaryCoords,
+        };
+        onPlaceSelected(payload);
+        
+        // emit('place-selected', {
+        //   name : result.name,
+        //   latitude : result.geometry.location.lat(),
+        //   longitude : result.geometry.location.lng(),
+        //   accuracy : accuracy
+        // })
       }
-    );
-  };
+    });
+  });
+  
+}
+
 
   return (
-    <div className="form-group mb-3 search-location">
-      <select className="form-control" id="choices-user-location">
-        <option value="">Your location</option>
-      </select>
+    <div className="search_location">
+      <select ref={selectRef} data-trigger onChange={selectPlace} name="search_location" id="choices-user-location"></select>
     </div>
   );
 };

@@ -46,7 +46,9 @@ export default function DashboardPage() {
   useEffect(() => {
 
     const fetchBillBoardLocationReport = async () => {
-      const res = await getBoardLocationsUploads({})
+      const res = await getBoardLocationsUploads({
+        size: 10
+      })
       if (res.status === 200) {
 
         setLocationReport(res.data)

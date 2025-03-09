@@ -1,6 +1,6 @@
 
 import { createRoot } from 'react-dom/client'
-// import './index.css'
+import './app.css'
 import { BrowserRouter, Route, Routes } from 'react-router'
 import AccountPage from './pages/account/AccountPage.jsx'
 import PublicLayout from './layout/PublicLayout.jsx'
@@ -27,6 +27,9 @@ import BillboardHistory from './pages/Billboards/BillboardHistory.jsx'
 import TeamPermissionDetails from './pages/Team/TeamPermissionDetails.jsx'
 import BillboardReport from './pages/Dashboard/BillboardReport.jsx'
 import PowerProjectLanding from './pages/Auth/Test.jsx'
+import ForgotPassword from './pages/Auth/ForgotPassword.jsx'
+import AuthLayout from './layout/AuthLayout.jsx'
+import ResetPassword from './pages/Auth/ResetPassword.jsx'
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
@@ -35,6 +38,12 @@ createRoot(document.getElementById('root')).render(
       <Route element={<PublicLayout />}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/test" element={<PowerProjectLanding />} />
+        <Route path="/term-policy" element={<TermPolicy />} />
+        <Route path='/forgot-password' element={<ForgotPassword />} />
+      </Route>
+
+      <Route element={<AuthLayout />}>
+        <Route path="/reset-password" element={<ResetPassword />} />
       </Route>
 
 
@@ -64,8 +73,7 @@ createRoot(document.getElementById('root')).render(
         {/* administrator routes */}
         <Route path="/role-settings" element={<RoleSettings />} />
         <Route path="/system-settings" element={<SystemSettings />} />
-        <Route path="/term-policy" element={<TermPolicy />} />
-
+        
         {/* profile */}
         <Route path="/user-account" element={<UserAccount />} />
         <Route path="/change-password" element={<ChangePassword />} />

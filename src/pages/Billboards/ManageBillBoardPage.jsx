@@ -14,6 +14,7 @@ export default function ManageBillBoardPage() {
     total_pages: 0,
     total: 0
   })
+ 
 
   useEffect(() => {
 
@@ -125,7 +126,7 @@ export default function ManageBillBoardPage() {
           </div>
         </div>
         <div className='card-body'>
-          {loadingTable ? <ShimmerTable row={5} col={5} loadingAnimation="pulse" /> : <>
+          {loadingTable ? <ShimmerTable row={3} col={5} loadingAnimation="pulse" /> : <>
             <div className='table-responsive'>
               <table className="table  table-hover">
                 <thead>

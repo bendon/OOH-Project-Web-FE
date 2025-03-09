@@ -19,7 +19,6 @@
       'horizontal-navbar-shape': 'phoenixNavbarTopShape',
       'horizontal-navbar-appearance': 'phoenixNavbarTopStyle'
     };
-  
     const initialConfig = {
       phoenixIsNavbarVerticalCollapsed: false,
       phoenixTheme: 'light',

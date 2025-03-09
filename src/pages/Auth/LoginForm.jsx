@@ -1,6 +1,6 @@
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import React, {  useState } from 'react'
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import GoogleOAuthButton from '../../google/GoogleOAuthButton';
 import { authLogin } from '../../data/lib';
 
@@ -22,7 +22,11 @@ export default function LoginForm() {
 
         if (response.status === 200) {
             setLoading(false)
-            navigate('/switch/account')
+            if(response.data.user && response.data.user.isChange) {
+                navigate('/reset-password')
+            }else{
+                navigate('/switch/account')
+            }
         } else {
             setError(response.error)
             setLoading(false)
@@ -37,7 +41,7 @@ export default function LoginForm() {
         <>
             <div className="row flex-center h-100 g-0 px-4 px-sm-0">
                 <div className="col col-sm-6 col-lg-7 col-xl-6">
-                    <a className="d-flex flex-center text-decoration-none mb-4" href="../../../index.html">
+                    <a className="d-flex flex-center text-decoration-none mb-4" href="/">
                         <div className="d-flex align-items-center fw-bolder fs-3 d-inline-block">
                             <img src="/project/bbscout.png" alt="phoenix" width="58" />
                         </div>
@@ -78,7 +82,7 @@ export default function LoginForm() {
                             <div className="form-check mb-0">
                             </div>
                         </div>
-                        <div className="col-auto"><a className="fs-9 fw-semibold" href="../../../pages/authentication/simple/forgot-password.html">Forgot Password?</a></div>
+                        <div className="col-auto"><Link to={'/forgot-password'} className="fs-9 fw-semibold" href="/">Forgot Password?</Link></div>
                     </div>
                 </div>
             </div>

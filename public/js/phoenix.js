@@ -2806,6 +2806,8 @@
     const activeNavLinkItem = document.querySelector(Selector.ACTIVE_NAV_LINK);
     if (navbarVerticalToggle) {
       navbarVerticalToggle.addEventListener(Events.CLICK, e => {
+     
+        
         const isNavbarVerticalCollapsed = getItemFromStore(
           'phoenixIsNavbarVerticalCollapsed',
           false
@@ -2831,6 +2833,8 @@
         false
       );
       if (activeNavLinkItem && !isNavbarVerticalCollapsed) {
+        
+        
         activeNavLinkItem.scrollIntoView({ behavior: 'smooth' });
       }
     }
@@ -4571,3 +4575,4 @@
 
 }));
 //# sourceMappingURL=phoenix.js.map
+

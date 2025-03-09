@@ -1091,6 +1091,74 @@ export async function getDailyUploadReport( payload) {
     }
 }
 
+export async function updateUserPermissions( payload) {
+    try {
+        const res  = await axiosApp.post(getApiUrl()+'/en/sl/permisions/staff/'+payload.staffId+'/update',payload.data ,{
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            }
+        })
+        return {
+            status: 200,
+            data: res.data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
+export async function postForgotPassword( payload) {
+    try {
+        const res  = await axiosApp.post(getApiUrl()+'/auth/forgot-password',payload ,{
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        return {
+            status: 200,
+            data: res.data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
+export async function postResetForgotPassword( payload) {
+    try {
+        const res  = await axiosApp.post(getApiUrl()+'/en/forgot-password/update',payload ,{
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            }
+        })
+        return {
+            status: 200,
+            data: res.data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
 
 
 

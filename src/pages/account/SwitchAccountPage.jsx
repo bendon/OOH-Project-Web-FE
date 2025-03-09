@@ -1,11 +1,26 @@
 import { SquareUser } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
-import { getUserAccount, postSwitchAccount } from '../../data/lib'
+import { getSession, getUserAccount, postSwitchAccount } from '../../data/lib'
 
 export default function SwitchAccountPage() {
     const [account, setAccount] = useState([])
     const [error, setError] = useState('')
+    const [currentSession, setSession] = useState(null)
+
+    useEffect(() => {
+        const activeSession = async () => {
+            const session = await getSession()
+
+            if(session.user.isChange) {
+                navigate('/reset-password')
+                return
+            }
+            
+            setSession(session)
+        }
+        activeSession()
+    }, [])
 
     const navigate = useNavigate()
     useEffect(() => {
@@ -15,7 +30,7 @@ export default function SwitchAccountPage() {
             setAccount(response.data)
         }
         setAccounts()
-    }, [])
+    }, [currentSession])
 
     const checkOutAccount = async () => {
         const formData = new FormData()
@@ -29,9 +44,9 @@ export default function SwitchAccountPage() {
     }
 
     // if the account has data and  the lenghth is 1
-      if (account.length === 1) {
+    if (account.length === 1) {
         checkOutAccount()
-      }
+    }
     return (
         <>
             <div className="container">
