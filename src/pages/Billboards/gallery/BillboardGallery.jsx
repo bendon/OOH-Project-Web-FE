@@ -170,7 +170,7 @@ export default function BillboardGallery() {
                             <div className="spinner-border text-primary me-3" role="status">
                                 <span className="visually-hidden">Loading...</span>
                             </div>
-                            <p className="mb-0 flex-1">Please wait updating user permissions ....</p>
+                            <p className="mb-0 flex-1">Please wait loading files ....</p>
                         </div>}
                         {files && files.data.length > 0 && files.data.map((file, index) => (
                             <div className="col-sm-6 col-xl-6 col-xxl-3" key={index}>
