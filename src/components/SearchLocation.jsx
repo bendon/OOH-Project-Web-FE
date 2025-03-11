@@ -69,6 +69,10 @@ const GooglePlacesAutocomplete = ({onPlaceSelected}) => {
 
         console.log("Google Maps API Loaded");
 
+        // set center of the map
+
+      
+
         if (!places) {
             console.error("Google Places library failed to load");
             return;
@@ -105,7 +109,6 @@ const GooglePlacesAutocomplete = ({onPlaceSelected}) => {
                 value: prediction.place_id,
                 label: prediction.description,
             }));
-            console.log(choices);
 
             if (choicesInstance.current) {
                 choicesInstance.current.clearStore(); // Clear previous options
@@ -122,7 +125,6 @@ const selectPlace = (event) => {
     startLoader()
   }
   const placeValue = event.target.value;
-  console.log(placeValue);
 
   loader.importLibrary("places").then(() => {
     const service = new google.maps.places.PlacesService(document.createElement('div'));

@@ -14,6 +14,8 @@ const TrafficLayer = () => {
     useEffect(() => {
         if (!map) return;
 
+        // console.log(map);
+        
         const trafficLayer = new window.google.maps.TrafficLayer();
         trafficLayer.setMap(map);
 
@@ -30,24 +32,8 @@ export default function GeolocationMap() {
     const [locations, setLocations] = useState([{ key: 'operaHouse', location: { lat: -33.8567844, lng: 151.213108 } }])
     const [center, setCenter] = useState({ lat: -1.2647263, lng: 36.80201 });
     const [selectedBillboard, setSelectedBillboard] = useState(null);;
-    const [polygonCoordinates, setPolygonCoordinates] = useState([
-        {
-            "lat": -0.4233130737472416,
-            "lng": 35.96048355500845
-        },
-        {
-            "lat": -0.4233130737472416,
-            "lng": 36.19723723446084
-        },
-        {
-            "lat": -0.2083105525442332,
-            "lng": 36.19723723446084
-        },
-        {
-            "lat": -0.2083105525442332,
-            "lng": 35.96048355500845
-        }
-    ]);
+    
+    const map = useMap();
 
     useEffect(() => {
         const fetchBillboards = async () => {
@@ -69,7 +55,7 @@ export default function GeolocationMap() {
     const mapUpdateLocation = () => {
         setTimeout(() => {
             if (billboards !== null && billboards.data.length > 0) {
-                setCenter({ lat: billboards.data[0].latitude, lng: billboards.data[0].longitude })
+                // setCenter({ lat: billboards.data[0].latitude, lng: billboards.data[0].longitude })
 
                 const locations = billboards.data.map(billboard => {
                     return {
@@ -105,8 +91,22 @@ export default function GeolocationMap() {
         fetchBillboardImage()
     }, [selectedBillboard])
 
-    const handleMapLoaded = () => {
+    const handleMapLoaded = (map) => {
         // console.log("map loaded")
+
+        
+        if (map) {
+            map.addListener("center_changed", () => {
+            const newCenter = map.getCenter();
+            console.log(newCenter.lat(), newCenter.lng());
+            
+            setCenter({
+                lat: newCenter.lat(),
+                lng: newCenter.lng(),
+            });
+        });
+        }
+        
 
     }
 
@@ -122,6 +122,17 @@ export default function GeolocationMap() {
 
     }, [center]);
 
+    useEffect(() => {
+        if (!map) return;
+        console.log(map);
+        
+    },[map])
+
+    const handleMapLoadedSheet = (map) => { 
+        console.log(map);
+        
+    }
+
 
     //{ lat: -1.2647263, lng: 36.80201 }
     return (
@@ -130,9 +141,9 @@ export default function GeolocationMap() {
                 <div className='col-lg-4'>
                 <h4 className='mb-3'>Billboard Location</h4>
                 <div className=''>
-            <GooglePlacesAutocomplete onPlaceSelected={(place) => {
+             <GooglePlacesAutocomplete onPlaceSelected={(place) => {
                       handleSelectedPlace(place)
-                    }} />
+                    }} /> 
             </div>
                 </div>
                 <div className='actions'>
@@ -141,13 +152,13 @@ export default function GeolocationMap() {
             </div>
             <hr />
             
-            <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAP_KEY} onLoad={() => handleMapLoaded()}>
+            <APIProvider  apiKey={import.meta.env.VITE_GOOGLE_MAP_KEY} onLoad={() => handleMapLoaded()}>
                 <Map
+                    onLoad={(map) => handleMapLoadedSheet(map)}
+                    
 
-
-                    defaultZoom={13}
-                    defaultCenter={center}
-                    // center={center}
+                    defaultZoom={15}
+                    defaultCenter={center} 
                     mapId={import.meta.env.VITE_GOOGLE_MAP_ID}
                     className="map-container"
                 >,
