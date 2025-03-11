@@ -98,7 +98,6 @@ export default function GeolocationMap() {
         if (map) {
             map.addListener("center_changed", () => {
             const newCenter = map.getCenter();
-            console.log(newCenter.lat(), newCenter.lng());
             
             setCenter({
                 lat: newCenter.lat(),
