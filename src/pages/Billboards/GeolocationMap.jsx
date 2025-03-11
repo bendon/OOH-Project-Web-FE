@@ -146,8 +146,8 @@ export default function GeolocationMap() {
 
 
                     defaultZoom={13}
-                    // defaultCenter={center}
-                    center={center}
+                    defaultCenter={center}
+                    // center={center}
                     mapId={import.meta.env.VITE_GOOGLE_MAP_ID}
                     className="map-container"
                 >,

@@ -33,11 +33,15 @@ const GooglePlacesAutocomplete = ({onPlaceSelected}) => {
   }, [])
 
   const startLoader = () => {
-    loader = new Loader({
+    if (!loader)
+    {
+      loader = new Loader({
         apiKey: import.meta.env.VITE_GOOGLE_MAP_KEY, // Replace with your API key
         version: "weekly",
         libraries: ["places"],
       });
+    }
+    
   }
 
   useEffect(() => {

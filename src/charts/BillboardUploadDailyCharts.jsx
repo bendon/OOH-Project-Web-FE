@@ -82,7 +82,7 @@ export default function BillboardUploadDailyChart() {
       flatpickr(inputRef.current, {
         enableTime: false,
         dateFormat: "Y-W", // Format: YYYY-WW (Year-Week)
-        weekNumbers: true,  // Show week numbers
+        weekNumbers: false,  // Show week numbers
         altInput: true,
         altFormat: "Y M \\Week W", // Display as "YYYY Week WW"
         defaultDate: new Date(),
