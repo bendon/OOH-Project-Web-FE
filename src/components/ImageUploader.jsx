@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { uploadFiles } from '../data/lib';
 
-export default function ImageUploader({ onImageNameChange }) {
+export default function ImageUploader({ onImageNameChange, file = null | undefined }) {
     const [imagePreview, setImagePreview] = useState(null);
     const [uploadedImage, setUploadedImage] = useState(false);
     const [uploadStatus, setUploadStatus] = useState(false);
@@ -52,17 +52,34 @@ export default function ImageUploader({ onImageNameChange }) {
         onImageNameChange(null);
         }
     };
+
+    useEffect(()=> {
+      if(file !== null && file !== undefined)
+      {
+        
+        setImagePreview(`https://scout.edgetech.co.ke/api/v1/auth/file/${file.fileUrl}`)
+        setImageDetails({
+          name: file.Name,
+          size: (file.fileSize / 1024).toFixed(2) + " KB",
+          type: file.fileExtension,
+          width: "",
+          height: "img.height",
+        });
+      }
+
+    },[file])
   return (
     <>
-    <div className="  rounded-2xl p-6 w-full max-w-md">
-    {imagePreview && (
+    <div className="  rounded-2xl p-2 w-full max-w-md">
+   
+    {imagePreview ? (
         <img
           src={imagePreview}
           alt="Uploaded Preview"
           className=" rounded-lg shadow mb-3"
           style={{ maxWidth: "100%", maxHeight: "300px" }}
         />
-      )}
+      ) : <div style={{height: "300px", backgroundColor:  '#ccc', borderRadius: 20, marginBottom:10}}></div>}
       <input
         type="file"
         accept="image/*"

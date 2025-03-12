@@ -31,6 +31,8 @@ import ForgotPassword from './pages/Auth/ForgotPassword.jsx'
 import AuthLayout from './layout/AuthLayout.jsx'
 import ResetPassword from './pages/Auth/ResetPassword.jsx'
 import BillboardGallery from './pages/Billboards/gallery/BillboardGallery.jsx'
+import EditBillboard from './pages/Billboards/EditBillboard.jsx'
+import ViewBillboard from './pages/Billboards/ViewBillboard.jsx'
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
@@ -63,6 +65,8 @@ createRoot(document.getElementById('root')).render(
         <Route path="/create-board" element={<CreateBillboardPage />} />
         <Route path="/billboard-locations" element={<GeolocationMap />} />
         <Route path="/billboard-info/:billboardId/history" element={<BillboardHistory />} />
+        <Route path="/edit/billboard/:billboardId/update" element={<EditBillboard />} />
+        <Route path="/show/billboard/:billboardId/details" element={<ViewBillboard />} />
         <Route path="/billboard-reports" element={<BillboardReport />} />
         <Route path="/file-gallery" element={<BillboardGallery />} />
         <Route path="/account" element={<AccountPage />} />

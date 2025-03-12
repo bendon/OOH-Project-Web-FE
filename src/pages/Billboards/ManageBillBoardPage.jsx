@@ -1,7 +1,7 @@
-import { CopyX, Edit, ListCollapse, PlusSquare } from 'lucide-react'
+import { CopyX, Edit, Eye, ListCollapse, PlusSquare, Trash } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router'
-import { getBillBoards, getBoardReport } from '../../data/lib'
+import { encryptText, getBillBoards, getBoardReport } from '../../data/lib'
 import { ShimmerTable, ShimmerTableRow } from 'react-shimmer-effects'
 
 export default function ManageBillBoardPage() {
@@ -158,9 +158,9 @@ export default function ManageBillBoardPage() {
                       <td>{billboard.active ? <span className='badge text-bg-success'>active</span> : <span className='badge text-bg-danger'>inactive</span>}</td>
                       <td>{billboard.location}</td>
                       <td className='text-end'>
-                        <Link to={`/billboard/${billboard.id}`} className='btn btn-subtle-primary me-1 mb-1 d-inline  p-1 global-size' ><Edit className='me-3' size={12} /> Edit</Link>
-                        <Link to={`/billboard/${billboard.id}`} className='btn btn-subtle-secondary me-1 mb-1 d-inline  p-1 global-size' ><ListCollapse className='me-3' size={12} /> manage</Link>
-                        <Link to={`/billboard/${billboard.id}`} className='btn btn-subtle-danger me-1 mb-2 d-inline  p-1 global-size' ><CopyX className='me-3' size={12} /> Delete</Link>
+                        <Link to={`/edit/billboard/${encryptText(billboard.id)}/update`} className='btn btn-subtle-primary me-1 mb-1 d-inline  p-1 global-size' ><Edit className='me-1' size={12} /> Edit</Link>
+                        <Link to={`/show/billboard/${encryptText(billboard.id)}/details`} className='btn btn-subtle-secondary me-1 mb-1 d-inline  p-1 global-size' ><Eye className='me-1' size={12} /> view</Link>
+                        {/* <Link to={`/billboard/${billboard.id}`} className='btn btn-subtle-danger me-1 mb-2 d-inline  p-1 global-size' ><Trash className='me-1' size={12} /> Delete</Link> */}
                       </td>
                     </tr>
                   ))}

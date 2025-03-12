@@ -627,6 +627,54 @@ export async function getBoardById(billboardId) {
     }
 }
 
+export async function getBoardSummaryByCode(code) {
+    try {
+
+        const res  = await axiosApp.get(getApiUrl()+'/en/sl/realted/billboards/'+code, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            }
+        })
+        return {
+            status: 200,
+            data: res.data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
+export async function putUpdateBoardById(payload) {
+    try {
+
+        const res  = await axiosApp.put(getApiUrl()+'/en/sl/update/billboard/'+payload.billboardId,payload.body, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            }
+        })
+        return {
+            status: 200,
+            data: res.data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
+
 export async function getBoardReport() {
     try {
 
