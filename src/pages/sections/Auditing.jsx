@@ -134,7 +134,7 @@ export default function Auditing() {
                         <input type="text" className='week-picker' placeholder='Enter Year' ref={inputToRef} style={{ display: "none" }} />
                     </div>
                     <button className='btn btn-subtle-primary me-1 mb-1' onClick={() => searchUploadReports()}><SearchIcon size={16} /> Search</button>
-                    <button className='btn btn-subtle-success me-1 mb-1' onClick={() => exportToExcel(tableRef, "Upload report " + startDate + ' to ' + endDate)}><Sheet size={16} /> Export to Excel</button>
+                    <button className='btn btn-subtle-success me-1 mb-1' onClick={() => exportToExcel(tableRef, "Auditing Report " + startDate + ' to ' + endDate)}><Sheet size={16} /> Export to Excel</button>
                     <Link to="/manage-boards" className='btn btn-subtle-primary' style={{ fontSize: '12px' }}><ClipboardCheck size={15} /> Billboard Management</Link>
                 </div>
             </div>

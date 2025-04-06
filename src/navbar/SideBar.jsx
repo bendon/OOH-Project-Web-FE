@@ -55,7 +55,7 @@ export default function SideBar() {
                 </div>
               </li>
               <li className="nav-item">
-                <p className="navbar-vertical-label">Sections</p>
+                <p className="navbar-vertical-label">Modules</p>
                 <hr className="navbar-vertical-line" />
                 <div className="nav-item-wrapper">
                     <NavLink className="nav-link label-1" to="/auditing" role="button" data-bs-toggle="" aria-expanded="false">
