@@ -33,6 +33,8 @@ import ResetPassword from './pages/Auth/ResetPassword.jsx'
 import BillboardGallery from './pages/Billboards/gallery/BillboardGallery.jsx'
 import EditBillboard from './pages/Billboards/EditBillboard.jsx'
 import ViewBillboard from './pages/Billboards/ViewBillboard.jsx'
+import Auditing from './pages/sections/Auditing.jsx'
+import Monitoring from './pages/sections/Monitoring.jsx'
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
@@ -68,6 +70,8 @@ createRoot(document.getElementById('root')).render(
         <Route path="/edit/billboard/:billboardId/update" element={<EditBillboard />} />
         <Route path="/show/billboard/:billboardId/details" element={<ViewBillboard />} />
         <Route path="/billboard-reports" element={<BillboardReport />} />
+        <Route path="/auditing" element={<Auditing />} />
+        <Route path="/monitoring" element={<Monitoring />} />
         <Route path="/file-gallery" element={<BillboardGallery />} />
         <Route path="/account" element={<AccountPage />} />
 

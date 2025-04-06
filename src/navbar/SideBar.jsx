@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, ChartColumnStacked, ChartNoAxesCombined, FolderKanban, Images, Key, LayoutDashboard, Lock, MapPinHouse, MonitorCog, ReceiptText, Sheet, Shield, ShieldCheck, SquarePlus, UserPlus, UserRoundCog, Users } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Blinds, BookUp2, ChartColumnStacked, ChartNoAxesCombined, FolderKanban, Images, Key, LayoutDashboard, Lock, MapPinHouse, ReceiptText, Sheet,  ShieldCheck, SquarePlus, UserPlus, UserRoundCog, Users } from 'lucide-react'
 import React from 'react'
 import { NavLink, useNavigate } from 'react-router'
 import { postUserLogOut } from '../data/lib'
@@ -50,6 +50,27 @@ export default function SideBar() {
                         <div className="d-flex align-items-center">
                             <span className="nav-link-icon"> <ChartColumnStacked size={18} className='icon'/> </span>
                             <span className="nav-link-text-wrapper"><span className="nav-link-text">Team Analysis</span></span>
+                        </div>
+                    </NavLink>
+                </div>
+              </li>
+              <li className="nav-item">
+                <p className="navbar-vertical-label">Sections</p>
+                <hr className="navbar-vertical-line" />
+                <div className="nav-item-wrapper">
+                    <NavLink className="nav-link label-1" to="/auditing" role="button" data-bs-toggle="" aria-expanded="false">
+                        <div className="d-flex align-items-center">
+                            <span className="nav-link-icon"> <Blinds size={18} className='icon'/> </span>
+                            <span className="nav-link-text-wrapper"><span className="nav-link-text">Audit</span></span>
+                        </div>
+                    </NavLink>
+                </div>
+
+                <div className="nav-item-wrapper">
+                    <NavLink className="nav-link label-1" to="/monitoring" role="button" data-bs-toggle="" aria-expanded="false">
+                        <div className="d-flex align-items-center">
+                            <span className="nav-link-icon"> <BookUp2 size={18} className='icon'/> </span>
+                            <span className="nav-link-text-wrapper"><span className="nav-link-text">Monitoring</span></span>
                         </div>
                     </NavLink>
                 </div>

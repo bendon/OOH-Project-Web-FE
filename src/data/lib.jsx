@@ -1230,6 +1230,29 @@ export async function getFilesGallery( payload) {
         }
     }
 }
+export async function getMonitoringList( payload) {
+    try {
+        const search = searchableQuery(payload)
+        const res  = await axiosApp.get(getApiUrl()+'/en/sl/monitoring/list'+search ,{
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await getToken()}`
+            }
+        })
+        return {
+            status: 200,
+            data: res.data,
+            error: null
+        }
+
+    }catch(err){
+        return {
+            status: err.status,
+            data: null,
+            error: err.response ? err.response.data.message : 'Something went wrong'
+        }
+    }
+}
 
 
 
