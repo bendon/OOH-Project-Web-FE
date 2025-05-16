@@ -76,7 +76,7 @@ export function getJoinedTime(unixTimestamp) {
     }
   
     return ' just now';
-  }
+}
 
 export const getFullDateFromWeek = (year, weekNumber, dayName) => {
     const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];

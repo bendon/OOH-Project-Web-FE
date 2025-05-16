@@ -33,7 +33,7 @@ export default function Auditing() {
         setExpandedRows(newExpandedRows);
     };
 
-    useEffect(() => {
+    useEffect(async () => {
 
         if (inputRef.current) {
             flatpickr(inputRef.current, {
@@ -68,6 +68,21 @@ export default function Auditing() {
                     }
                 }
             });
+        }
+
+        const res = await getDailyUploadReport({
+            startDate: "2025-01-01",
+            endDate: "2025-12-01",
+            size: size,
+        })
+        if (res.status === 200) {
+            setReport(res.data)
+            setPaging({
+                page: res.data.page,
+                size: res.data.page_size,
+                total_pages: res.data.total_pages,
+                total: res.data.total
+              })
         }
     }, []);
 

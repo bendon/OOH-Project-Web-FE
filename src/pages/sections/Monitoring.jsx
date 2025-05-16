@@ -23,7 +23,7 @@ export default function Monitoring() {
 
     const [expandedRows, setExpandedRows] = useState(new Set());
 
-    useEffect(() => {
+    useEffect(async () => {
 
         if (inputRef.current) {
             flatpickr(inputRef.current, {
@@ -58,6 +58,22 @@ export default function Monitoring() {
                     }
                 }
             });
+        }
+
+        const res = await getMonitoringList({
+            startDate: "2025-01-01",
+            endDate: "2025-12-01",
+            size: size,
+            page: 1
+        })
+        if (res.status === 200) {
+            setMonitoring(res.data)
+            setPaging({
+                page: res.data.page,
+                size: res.data.page_size,
+                total_pages: res.data.total_pages,
+                total: res.data.total
+            })
         }
     }, []);
 
